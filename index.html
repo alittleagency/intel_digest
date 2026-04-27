@@ -11,7 +11,7 @@
 
   .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 8px; }
   .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #1a3a2a; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #1a3a2a; flex-shrink: 0; }
   .title { font-size: 20px; font-weight: 600; color: #1a1a18; letter-spacing: -0.01em; }
   .datestamp { font-size: 13px; color: #888; }
 
@@ -29,26 +29,51 @@
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
-  .context-bar { border-left: 3px solid #1a3a2a; border-radius: 0 6px 6px 0; padding: 10px 14px; margin-bottom: 1rem; font-size: 12px; color: #2d5a3d; line-height: 1.6; background: #eef4f0; }
-  .context-bar.watch { border-left-color: #8b2a1a; color: #6b2020; background: #f7f0f0; }
-
-  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #aaa; margin: 1.25rem 0 0.75rem; }
+  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; margin: 1.5rem 0 0.75rem; }
   .section-label:first-child { margin-top: 0; }
 
+  /* Trend cards — the main event */
+  .trend-card { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; }
+  .trend-card:hover { border-color: #c8c4b8; }
+  .trend-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .trend-topic { font-size: 14px; font-weight: 600; color: #1a1a18; line-height: 1.4; }
+  .trend-heat { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .heat-bar { display: flex; gap: 2px; }
+  .heat-pip { width: 5px; height: 14px; border-radius: 2px; background: #e2e0d8; }
+  .heat-pip.on { background: #1a3a2a; }
+  .heat-pip.on.watch { background: #8b2a1a; }
+  .heat-count { font-size: 11px; color: #888; white-space: nowrap; }
+  .trend-angle { font-size: 12.5px; color: #444; line-height: 1.6; margin-bottom: 10px; }
+  .trend-senders { font-size: 11px; color: #888; margin-bottom: 10px; }
+  .trend-senders strong { color: #555; font-weight: 500; }
+  .trend-examples { border-top: 0.5px solid #f0ede6; padding-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+  .example-line { font-size: 11.5px; color: #666; line-height: 1.5; padding-left: 10px; border-left: 2px solid #e2e0d8; font-style: italic; }
+
+  /* GOP spend cards */
+  .spend-card { background: #fff; border: 0.5px solid #e2e0d8; border-left: 3px solid #8b2a1a; border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 8px; }
+  .spend-card:hover { border-color: #c8c4b8; border-left-color: #8b2a1a; }
+  .spend-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+  .spend-title { font-size: 13.5px; font-weight: 500; color: #1a1a18; line-height: 1.4; }
+  .spend-source { font-size: 11px; color: #aaa; white-space: nowrap; flex-shrink: 0; }
+  .spend-detail { font-size: 12px; color: #555; line-height: 1.6; margin-bottom: 6px; }
+  .spend-fodder { font-size: 11.5px; color: #2d5a3d; background: #eef4f0; border-radius: 5px; padding: 6px 10px; line-height: 1.5; }
+  .spend-fodder-label { font-weight: 600; font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: #3d7a5a; margin-bottom: 2px; }
+
+  /* Flags */
   .flag-card { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
-  .flag-card:hover { border-color: #c8c4b8; }
   .flag-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
   .flag-dot.red { background: #c0392b; }
   .flag-dot.amber { background: #d4860a; }
   .flag-dot.green { background: #3d7a5a; }
-  .flag-title { font-size: 13.5px; font-weight: 500; color: #1a1a18; margin-bottom: 4px; line-height: 1.4; }
-  .flag-meta { font-size: 12px; color: #888; margin-bottom: 6px; }
-  .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; margin-right: 5px; letter-spacing: 0.02em; }
+  .flag-title { font-size: 13.5px; font-weight: 500; color: #1a1a18; margin-bottom: 3px; line-height: 1.4; }
+  .flag-meta { font-size: 12px; color: #888; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; margin: 4px 4px 0 0; letter-spacing: 0.02em; }
   .tag-shift { background: #fde8e4; color: #8b2a1a; }
   .tag-new   { background: #e3eef9; color: #14508a; }
   .tag-spike { background: #fef3e2; color: #7a4800; }
   .tag-ad    { background: #e6f2e8; color: #245c30; }
 
+  /* Email list */
   .email-list { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; overflow: hidden; }
   .email-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid #f0ede6; }
   .email-row:last-child { border-bottom: none; }
@@ -57,27 +82,22 @@
   .email-subject { font-size: 12px; color: #888; margin-top: 2px; }
   .email-time { font-size: 11px; color: #aaa; white-space: nowrap; margin-left: 12px; flex-shrink: 0; }
 
-  .trend-wrap { margin-bottom: 14px; }
-  .trend-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
-  .trend-row span:first-child { color: #555; }
-  .trend-row span:last-child { font-weight: 500; color: #1a1a18; }
-  .trend-track { background: #f0ede6; border-radius: 3px; height: 5px; }
-  .trend-fill { height: 5px; border-radius: 3px; }
-  .fill-dark { background: #1a3a2a; }
-  .fill-red  { background: #8b2a1a; }
-  .fill-mid  { background: #3d7a5a; }
-
-  .action-btns { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px; }
-  .ask-btn { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 8px; padding: 11px 16px; font-size: 13px; cursor: pointer; color: #1a1a18; text-align: left; font-family: inherit; display: flex; justify-content: space-between; align-items: center; }
-  .ask-btn:hover { background: #f5f4f0; border-color: #c8c4b8; }
-  .ask-arrow { color: #aaa; font-size: 14px; flex-shrink: 0; margin-left: 12px; }
+  /* Deep dive buttons */
+  .dive-section { margin-top: 1.75rem; }
+  .dive-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; margin-bottom: 10px; }
+  .dive-btn { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 8px; padding: 12px 16px; font-size: 13px; cursor: pointer; color: #1a1a18; text-align: left; font-family: inherit; display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px; }
+  .dive-btn:hover { background: #f5f4f0; border-color: #c8c4b8; }
+  .dive-btn-body { flex: 1; }
+  .dive-btn-title { font-weight: 500; margin-bottom: 2px; }
+  .dive-btn-sub { font-size: 11.5px; color: #888; }
+  .dive-arrow { color: #1a3a2a; font-size: 15px; flex-shrink: 0; margin-left: 14px; font-weight: 600; }
 
   .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
   .filter-btn { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 6px; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #555; font-family: inherit; }
-  .filter-btn:hover { border-color: #aaa; color: #1a1a18; }
+  .filter-btn:hover { border-color: #aaa; }
   .filter-btn.active { background: #1a3a2a; color: #fff; border-color: #1a3a2a; }
 
-  .divider { height: 0.5px; background: #e2e0d8; margin: 1.25rem 0; }
+  .divider { height: 0.5px; background: #e2e0d8; margin: 1.5rem 0; }
 </style>
 </head>
 <body>
@@ -93,34 +113,184 @@
 
   <div class="stats">
     <div class="stat"><div class="stat-label">Emails</div><div class="stat-val">23</div></div>
-    <div class="stat"><div class="stat-label">Red flags</div><div class="stat-val red">3</div></div>
-    <div class="stat"><div class="stat-label">Watch items</div><div class="stat-val amber">4</div></div>
-    <div class="stat"><div class="stat-label">New senders</div><div class="stat-val">1</div></div>
+    <div class="stat"><div class="stat-label">Trending topics</div><div class="stat-val">4</div></div>
+    <div class="stat"><div class="stat-label">GOP spend signals</div><div class="stat-val red">3</div></div>
+    <div class="stat"><div class="stat-label">New senders</div><div class="stat-val amber">1</div></div>
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="showTab('flags', this)">Flagged</button>
+    <button class="tab active" onclick="showTab('trends', this)">Messaging trends</button>
+    <button class="tab" onclick="showTab('gop', this)">GOP spend intel</button>
+    <button class="tab" onclick="showTab('flags', this)">Other flags</button>
     <button class="tab" onclick="showTab('all', this)">All emails</button>
-    <button class="tab" onclick="showTab('trends', this)">Trends</button>
   </div>
 
-  <div id="flags" class="tab-panel active">
+  <!-- MESSAGING TRENDS TAB -->
+  <div id="trends" class="tab-panel active">
 
-    <div class="context-bar">
-      <strong>D-side client signals</strong> — messaging shifts here are direct indicators of what clients will ask for next. When language pivots across multiple senders on the same day, that's coordinated.
-    </div>
+    <div class="section-label">D-side · trending topics this week</div>
 
-    <div class="section-label">Red flags — requires attention</div>
-
-    <div class="flag-card">
-      <div class="flag-dot red"></div>
-      <div>
-        <div class="flag-title">Priorities USA shifted messaging — "accountability" replacing "extreme"</div>
-        <div class="flag-meta">4th email in 6 days using new framing. Possible coordinated D-side pivot. · 5:47 AM</div>
-        <span class="tag tag-shift">Messaging shift</span>
-        <span class="tag tag-spike">4× this week</span>
+    <div class="trend-card">
+      <div class="trend-card-header">
+        <div class="trend-topic">"Accountability" — replacing "extreme" as the dominant attack frame</div>
+        <div class="trend-heat">
+          <div class="heat-bar">
+            <div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip"></div>
+          </div>
+          <div class="heat-count">9 emails · 4 days</div>
+        </div>
+      </div>
+      <div class="trend-angle">Priorities USA, DCCC, and House Majority PAC have all shifted from "extreme/extremist" language to "accountability" framing this week. The angle is less about labeling Republicans and more about holding them responsible for specific votes — healthcare, Social Security, abortion access. Feels coordinated.</div>
+      <div class="trend-senders"><strong>Senders:</strong> Priorities USA, DCCC, House Majority PAC, American Bridge</div>
+      <div class="trend-examples">
+        <div class="example-line">"It's time to hold them accountable for gutting Medicaid" — Priorities USA, 4/27</div>
+        <div class="example-line">"Accountability starts at the ballot box" — DCCC, 4/26</div>
+        <div class="example-line">"No accountability, no majority" — House Majority PAC, 4/25</div>
       </div>
     </div>
+
+    <div class="trend-card">
+      <div class="trend-card-header">
+        <div class="trend-topic">Medicaid cuts as primary mobilization hook</div>
+        <div class="trend-heat">
+          <div class="heat-bar">
+            <div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip"></div><div class="heat-pip"></div>
+          </div>
+          <div class="heat-count">7 emails · 5 days</div>
+        </div>
+      </div>
+      <div class="trend-angle">Medicaid is the specific policy vehicle being used in fundraising and mobilization emails — not "healthcare" broadly. Subject lines are leaning into dollar amounts and constituent impact. "X million people could lose coverage" framing appearing across multiple senders.</div>
+      <div class="trend-senders"><strong>Senders:</strong> DSCC, Care in Action, Senate Majority PAC, DCCC</div>
+      <div class="trend-examples">
+        <div class="example-line">"$880 billion in Medicaid cuts. Real people. Real harm." — DSCC, 4/27</div>
+        <div class="example-line">"Home care workers will lose their jobs. Their clients will lose their care." — Care in Action, 4/26</div>
+      </div>
+    </div>
+
+    <div class="trend-card">
+      <div class="trend-card-header">
+        <div class="trend-topic">FEC deadline urgency — end-of-quarter fundraising spike</div>
+        <div class="trend-heat">
+          <div class="heat-bar">
+            <div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div>
+          </div>
+          <div class="heat-count">11 emails · 3 days</div>
+        </div>
+      </div>
+      <div class="trend-angle">Q1 FEC deadline is Friday. Almost every D-side org is in full fundraising mode — subject lines are leaning heavily on deadline urgency, matching gift offers, and donor rank/status. Not a messaging pivot, but volume is spiking and tone is more transactional than persuasive this week.</div>
+      <div class="trend-senders"><strong>Senders:</strong> DCCC, DNC, DSCC, EMILY's List, Senate Majority PAC, Run for Something</div>
+      <div class="trend-examples">
+        <div class="example-line">"Hours left. Will you be one of our 500 donors before midnight?" — DCCC, 4/27</div>
+        <div class="example-line">"Our FEC report goes public Friday. Don't let it tell the wrong story." — DNC, 4/26</div>
+      </div>
+    </div>
+
+    <div class="trend-card">
+      <div class="trend-card-header">
+        <div class="trend-topic">AI in political advertising — industry conversation picking up</div>
+        <div class="trend-heat">
+          <div class="heat-bar">
+            <div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip"></div><div class="heat-pip"></div><div class="heat-pip"></div>
+          </div>
+          <div class="heat-count">3 emails · 7 days</div>
+        </div>
+      </div>
+      <div class="trend-angle">Campaigns & Elections and two vendor newsletters this week touched on AI-generated ad creative, with different angles: C&E focused on the speed advantage, a vendor newsletter raised disclosure/compliance questions, and Politico flagged platform policy gaps. Still early but the trade press is watching it closely.</div>
+      <div class="trend-senders"><strong>Senders:</strong> Campaigns & Elections, AdImpact Newsletter, Politico Playbook</div>
+      <div class="trend-examples">
+        <div class="example-line">"The campaigns using AI creative in 2026 are moving faster than compliance can keep up" — C&E, 4/27</div>
+      </div>
+    </div>
+
+    <div class="dive-section">
+      <div class="dive-label">Ask Claude to go deeper</div>
+      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
+        <div class="dive-btn-body">
+          <div class="dive-btn-title">Summarize D-side messaging trends this week across all emails</div>
+          <div class="dive-btn-sub">Full analysis with examples, pivot points, and what to watch next week</div>
+        </div>
+        <div class="dive-arrow">↗</div>
+      </button>
+      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
+        <div class="dive-btn-body">
+          <div class="dive-btn-title">Is the "accountability" pivot coordinated? Compare timing across senders</div>
+          <div class="dive-btn-sub">Look for same-day sends, shared language, likely origin</div>
+        </div>
+        <div class="dive-arrow">↗</div>
+      </button>
+      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
+        <div class="dive-btn-body">
+          <div class="dive-btn-title">What creative angles are D-side PACs using on Medicaid right now?</div>
+          <div class="dive-btn-sub">Pull examples and summarize the emotional hooks being used</div>
+        </div>
+        <div class="dive-arrow">↗</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- GOP SPEND INTEL TAB -->
+  <div id="gop" class="tab-panel">
+
+    <div class="section-label">Where Republicans are spending — good fodder for your emails</div>
+
+    <div class="spend-card">
+      <div class="spend-header">
+        <div class="spend-title">NRCC buying in OH-07, PA-08, AZ-01 — three Frontline districts at once</div>
+        <div class="spend-source">NRCC · 6:12 AM</div>
+      </div>
+      <div class="spend-detail">Email footer named media vendors in all three districts. Unusual to see three simultaneous buys in an April email — suggests early pressure campaign rather than end-of-cycle surge. OH-07 (Rulli) and PA-08 (Cartwright) are both on the DCCC Frontline list.</div>
+      <div class="spend-fodder">
+        <div class="spend-fodder-label">Fodder for your emails</div>
+        Republicans are already on air in these districts — months ahead of where they were in the last cycle. If your clients are in OH-07 or PA-08, this is a reason to get on air now and frame the race before R-side ads define the landscape.
+      </div>
+    </div>
+
+    <div class="spend-card">
+      <div class="spend-header">
+        <div class="spend-title">Senate Leadership Fund referencing Georgia and Michigan together — unusual pairing</div>
+        <div class="spend-source">Senate Leadership Fund · 5:22 AM</div>
+      </div>
+      <div class="spend-detail">SLF hasn't historically grouped GA and MI in the same fundraising email. The pairing suggests they may be reallocating resources toward both simultaneously — possibly responding to Ossoff's strong Q1 numbers or signaling a Michigan pickup attempt is becoming more real to them.</div>
+      <div class="spend-fodder">
+        <div class="spend-fodder-label">Fodder for your emails</div>
+        When the other side names your client's race in their fundraising, it's validation. "Even Republicans know this seat is in play" is a strong urgency frame for donor emails in both states.
+      </div>
+    </div>
+
+    <div class="spend-card">
+      <div class="spend-header">
+        <div class="spend-title">Club for Growth previewing primary targets — 6 House seats named</div>
+        <div class="spend-source">Club for Growth Action · 1:22 AM</div>
+      </div>
+      <div class="spend-detail">Email named six House districts where CfG plans primary intervention — all in safe R seats. This is an indicator of where the GOP base is moving rightward, and which general election opponents your clients may eventually face. Three of the six districts overlap with DCCC's 2026 expansion map.</div>
+      <div class="spend-fodder">
+        <div class="spend-fodder-label">Fodder for your emails</div>
+        R primaries moving right = more extreme general election opponents. "They chose the most extreme candidate" is a ready-made frame for the fall if CfG's picks win their primaries.
+      </div>
+    </div>
+
+    <div class="dive-section">
+      <div class="dive-label">Ask Claude to go deeper</div>
+      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
+        <div class="dive-btn-body">
+          <div class="dive-btn-title">Where is R-side money moving this week compared to last week?</div>
+          <div class="dive-btn-sub">Track shifts in geographic focus across NRCC, SLF, CLF, and CfG</div>
+        </div>
+        <div class="dive-arrow">↗</div>
+      </button>
+      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
+        <div class="dive-btn-body">
+          <div class="dive-btn-title">Draft a donor email using the NRCC buy in OH-07 as urgency fodder</div>
+          <div class="dive-btn-sub">Frame: Republicans are already on air, we need to match them now</div>
+        </div>
+        <div class="dive-arrow">↗</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- OTHER FLAGS TAB -->
+  <div id="flags" class="tab-panel">
+    <div class="section-label">Flags</div>
 
     <div class="flag-card">
       <div class="flag-dot red"></div>
@@ -131,86 +301,58 @@
       </div>
     </div>
 
-    <div class="divider"></div>
-
-    <div class="context-bar watch">
-      <strong>R-side watch</strong> — these orgs are running ads in the same races your clients are in. Their messaging sets the frame your clients need to counter. Not prospecting, just surveillance.
-    </div>
-
-    <div class="flag-card">
-      <div class="flag-dot red"></div>
-      <div>
-        <div class="flag-title">NRCC announced new ad buys — OH-07, PA-08, AZ-01</div>
-        <div class="flag-meta">Three districts where D spending is active. Vendor names visible in footer. · 6:12 AM</div>
-        <span class="tag tag-ad">R-side ad buy</span>
-        <span class="tag tag-spike">3 districts</span>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="context-bar">
-      <strong>Industry &amp; new business</strong> — peer agency coverage, race rating shifts, and FEC activity signaling new money entering the space.
-    </div>
-
-    <div class="section-label">Watch items</div>
-
     <div class="flag-card">
       <div class="flag-dot amber"></div>
       <div>
-        <div class="flag-title">DCCC emailing daily this week — up from 2x/week cadence</div>
-        <div class="flag-meta">Fundraising spike tied to FEC deadline Friday. Expect clients to follow with donation asks. · 7:01 AM</div>
+        <div class="flag-title">FEC Notifications: 3 new PAC registrations filed</div>
+        <div class="flag-meta">New entrants into the cycle — worth cross-referencing against known D-aligned donors. · 11:45 PM</div>
+        <span class="tag tag-new">New PACs</span>
       </div>
     </div>
 
     <div class="flag-card">
       <div class="flag-dot amber"></div>
       <div>
-        <div class="flag-title">Senate Leadership Fund referencing Georgia and Michigan in same email</div>
-        <div class="flag-meta">Unusual geographic pairing — possible R resource reallocation signal. · 5:22 AM</div>
-      </div>
-    </div>
-
-    <div class="flag-card">
-      <div class="flag-dot amber"></div>
-      <div>
-        <div class="flag-title">Campaigns &amp; Elections: article on AI creative tools in political ads</div>
-        <div class="flag-meta">Industry coverage of AI-generated ad creative — worth reading for positioning. · 4:00 AM</div>
-        <span class="tag tag-ad">Industry</span>
+        <div class="flag-title">Cook Political Report: 3 race ratings moved this week</div>
+        <div class="flag-meta">Any movement in Toss-Up or Lean D races affects where client dollars go. · 2:00 AM</div>
       </div>
     </div>
 
     <div class="flag-card">
       <div class="flag-dot green"></div>
       <div>
-        <div class="flag-title">OpenSecrets: new Q1 outside spending data published</div>
-        <div class="flag-meta">Full IE dataset now live — useful for client briefings on where D money is flowing. · 3:15 AM</div>
+        <div class="flag-title">OpenSecrets: Q1 outside spending data published</div>
+        <div class="flag-meta">Full IE dataset now live — useful for client briefings on where D money flowed. · 3:15 AM</div>
       </div>
     </div>
 
-    <div class="action-btns">
-      <button class="ask-btn" onclick="alert('In the live version, this sends a prompt to Claude for deeper analysis.')">
-        Dig into the Priorities USA messaging shift — what should we be preparing?
-        <span class="ask-arrow">↗</span>
+    <div class="dive-section">
+      <div class="dive-label">Ask Claude to go deeper</div>
+      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
+        <div class="dive-btn-body">
+          <div class="dive-btn-title">Research Forward Together PAC — who might be behind it?</div>
+          <div class="dive-btn-sub">Cross-reference FEC filings, donor patterns, and known D-aligned orgs</div>
+        </div>
+        <div class="dive-arrow">↗</div>
       </button>
-      <button class="ask-btn" onclick="alert('In the live version, this sends a prompt to Claude for deeper analysis.')">
-        Research Forward Together PAC — who might be behind it?
-        <span class="ask-arrow">↗</span>
-      </button>
-      <button class="ask-btn" onclick="alert('In the live version, this sends a prompt to Claude for deeper analysis.')">
-        Summarize D-side messaging trends this week across all emails
-        <span class="ask-arrow">↗</span>
+      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
+        <div class="dive-btn-body">
+          <div class="dive-btn-title">Which Cook race rating changes affect our active client races?</div>
+          <div class="dive-btn-sub">Flag any movement in seats where D-side clients are currently spending</div>
+        </div>
+        <div class="dive-arrow">↗</div>
       </button>
     </div>
   </div>
 
+  <!-- ALL EMAILS TAB -->
   <div id="all" class="tab-panel">
     <div class="filter-row">
       <button class="filter-btn active" onclick="filterEmails('all', this)">All 23</button>
-      <button class="filter-btn" onclick="filterEmails('flag', this)">Flagged</button>
       <button class="filter-btn" onclick="filterEmails('dside', this)">D-side</button>
       <button class="filter-btn" onclick="filterEmails('watch', this)">R-side watch</button>
       <button class="filter-btn" onclick="filterEmails('news', this)">Industry</button>
+      <button class="filter-btn" onclick="filterEmails('flag', this)">Flagged</button>
     </div>
     <div class="email-list" id="emailList">
       <div class="email-row" data-type="dside flag"><div><div class="email-sender">DCCC <span class="tag tag-spike">spike</span></div><div class="email-subject">2026 PRIORITIES SURVEY ENCLOSED</div></div><div class="email-time">7:01 AM</div></div>
@@ -226,9 +368,9 @@
       <div class="email-row" data-type="dside"><div><div class="email-sender">DNC</div><div class="email-subject">Weekend momentum report</div></div><div class="email-time">2:58 AM</div></div>
       <div class="email-row" data-type="dside"><div><div class="email-sender">House Majority PAC</div><div class="email-subject">These 6 seats decide everything</div></div><div class="email-time">2:44 AM</div></div>
       <div class="email-row" data-type="dside"><div><div class="email-sender">American Bridge</div><div class="email-subject">Opposition research drop</div></div><div class="email-time">2:31 AM</div></div>
-      <div class="email-row" data-type="news"><div><div class="email-sender">Cook Political Report</div><div class="email-subject">Race rating changes: 3 seats move</div></div><div class="email-time">2:00 AM</div></div>
+      <div class="email-row" data-type="news flag"><div><div class="email-sender">Cook Political Report</div><div class="email-subject">Race rating changes: 3 seats move</div></div><div class="email-time">2:00 AM</div></div>
       <div class="email-row" data-type="watch"><div><div class="email-sender">NRSC</div><div class="email-subject">Senate recruitment update</div></div><div class="email-time">1:45 AM</div></div>
-      <div class="email-row" data-type="watch"><div><div class="email-sender">Club for Growth Action</div><div class="email-subject">Primary season preview</div></div><div class="email-time">1:22 AM</div></div>
+      <div class="email-row" data-type="watch flag"><div><div class="email-sender">Club for Growth Action</div><div class="email-subject">Primary season preview</div></div><div class="email-time">1:22 AM</div></div>
       <div class="email-row" data-type="watch"><div><div class="email-sender">RNC</div><div class="email-subject">Voter registration numbers are in</div></div><div class="email-time">1:10 AM</div></div>
       <div class="email-row" data-type="dside"><div><div class="email-sender">Senate Majority PAC</div><div class="email-subject">Our path to 51 seats</div></div><div class="email-time">12:55 AM</div></div>
       <div class="email-row" data-type="news"><div><div class="email-sender">Politico Playbook</div><div class="email-subject">Monday morning: what to watch</div></div><div class="email-time">12:30 AM</div></div>
@@ -237,30 +379,6 @@
       <div class="email-row" data-type="news flag"><div><div class="email-sender">FEC Notifications <span class="tag tag-new">new PACs</span></div><div class="email-subject">New PAC registrations: 3 filed</div></div><div class="email-time">11:45 PM</div></div>
       <div class="email-row" data-type="news"><div><div class="email-sender">The Morning Score</div><div class="email-subject">Campaign finance weekly</div></div><div class="email-time">11:30 PM</div></div>
     </div>
-  </div>
-
-  <div id="trends" class="tab-panel">
-    <div class="context-bar">
-      <strong>D-side keyword trends</strong> — frequency across D-side emails is a leading indicator for upcoming creative briefs. A word trending up means expect a campaign around it soon.
-    </div>
-    <div class="section-label">7-day D-side messaging · top keywords</div>
-    <div id="tb1"></div>
-
-    <div class="divider"></div>
-
-    <div class="context-bar watch">
-      <strong>R-side counter-messaging</strong> — the frames your clients are responding to. Useful for briefing creative teams on what opponents are saying this week.
-    </div>
-    <div class="section-label">7-day R-side messaging</div>
-    <div id="tb2"></div>
-
-    <div class="divider"></div>
-
-    <div class="context-bar">
-      <strong>Volume by sender type</strong> — a spike in industry newsletter volume often signals a major spend announcement. FEC spikes = new money entering races.
-    </div>
-    <div class="section-label">Volume by sender type · this week</div>
-    <div id="tb3"></div>
   </div>
 
 </div>
@@ -278,14 +396,6 @@ function filterEmails(type, el) {
     row.style.display = (type === 'all' || (row.dataset.type||'').includes(type)) ? '' : 'none';
   });
 }
-function bars(id, data, cls) {
-  document.getElementById(id).innerHTML = data.map(([l,p]) =>
-    `<div class="trend-wrap"><div class="trend-row"><span>${l}</span><span>${p}%</span></div><div class="trend-track"><div class="trend-fill ${cls}" style="width:${p}%"></div></div></div>`
-  ).join('');
-}
-bars('tb1', [['accountability',91],['extreme / extremist',63],['majority',58],['deadline',55],['battleground',44],['AI / artificial intelligence',38],['recruitment',29]], 'fill-dark');
-bars('tb2', [['radical / radicalism',78],['border / border security',65],['government spending',52],['crime / public safety',44]], 'fill-red');
-bars('tb3', [['D-side PACs & party cmtes',48],['R-side watch',24],['Industry newsletters',18],['FEC / regulatory',10]], 'fill-mid');
 </script>
 </body>
 </html>
