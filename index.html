@@ -3,24 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PAC Intel Daily Digest</title>
+<title>Topic Performance Report</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #1a1a18; min-height: 100vh; padding: 2rem; }
-  .container { max-width: 860px; margin: 0 auto; }
+  .container { max-width: 980px; margin: 0 auto; }
 
   .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 8px; }
   .logo { display: flex; align-items: center; gap: 10px; }
   .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #1a3a2a; flex-shrink: 0; }
   .title { font-size: 20px; font-weight: 600; color: #1a1a18; letter-spacing: -0.01em; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
   .datestamp { font-size: 13px; color: #888; }
 
+  /* date range toggle */
+  .date-toggle { display: flex; gap: 4px; }
+  .dtb { padding: 4px 10px; font-size: 12px; font-weight: 500; cursor: pointer; color: #888; border: 0.5px solid #e2e0d8; border-radius: 5px; background: #fff; font-family: inherit; transition: all 0.1s; }
+  .dtb:hover { border-color: #aaa; color: #1a1a18; }
+  .dtb.on { background: #1a3a2a; color: #fff; border-color: #1a3a2a; }
+
   .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.75rem; }
-  .stat { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; padding: 14px 16px; }
+  .stat { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; padding: 14px 16px; transition: all 0.15s; }
   .stat-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
   .stat-val { font-size: 26px; font-weight: 600; color: #1a1a18; line-height: 1; }
-  .stat-val.red { color: #c0392b; }
-  .stat-val.amber { color: #9a5c00; }
 
   .tabs { display: flex; border-bottom: 0.5px solid #e2e0d8; margin-bottom: 1.5rem; overflow-x: auto; }
   .tabs::-webkit-scrollbar { display: none; }
@@ -33,87 +38,56 @@
   .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; margin: 1.5rem 0 0.75rem; }
   .section-label:first-child { margin-top: 0; }
 
-  .trend-card { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; }
-  .trend-card:hover { border-color: #c8c4b8; }
-  .trend-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-  .trend-topic { font-size: 14px; font-weight: 600; color: #1a1a18; line-height: 1.4; }
-  .trend-heat { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .heat-bar { display: flex; gap: 2px; }
-  .heat-pip { width: 5px; height: 14px; border-radius: 2px; background: #e2e0d8; }
-  .heat-pip.on { background: #1a3a2a; }
-  .heat-count { font-size: 11px; color: #888; white-space: nowrap; }
-  .trend-angle { font-size: 12.5px; color: #444; line-height: 1.6; margin-bottom: 10px; }
-  .trend-senders { font-size: 11px; color: #888; margin-bottom: 10px; }
-  .trend-senders strong { color: #555; font-weight: 500; }
-  .trend-examples { border-top: 0.5px solid #f0ede6; padding-top: 10px; display: flex; flex-direction: column; gap: 5px; }
-  .example-line { font-size: 11.5px; color: #666; line-height: 1.5; padding-left: 10px; border-left: 2px solid #e2e0d8; font-style: italic; }
+  .context-bar { background: #eef4f0; border-left: 3px solid #1a3a2a; border-radius: 0 6px 6px 0; padding: 10px 14px; margin-bottom: 1rem; font-size: 12px; color: #2d5a3d; line-height: 1.6; }
 
-  .spend-card { background: #fff; border: 0.5px solid #e2e0d8; border-left: 3px solid #8b2a1a; border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 8px; }
-  .spend-card:hover { border-color: #c8c4b8; border-left-color: #8b2a1a; }
-  .spend-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
-  .spend-title { font-size: 13.5px; font-weight: 500; color: #1a1a18; line-height: 1.4; }
-  .spend-source { font-size: 11px; color: #aaa; white-space: nowrap; flex-shrink: 0; }
-  .spend-detail { font-size: 12px; color: #555; line-height: 1.6; margin-bottom: 6px; }
-  .spend-fodder { font-size: 11.5px; color: #2d5a3d; background: #eef4f0; border-radius: 5px; padding: 6px 10px; line-height: 1.5; }
-  .spend-fodder-label { font-weight: 600; font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: #3d7a5a; margin-bottom: 2px; }
+  .table-wrap { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+  .topic-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .topic-table thead tr { background: #1a3a2a; }
+  .topic-table th { padding: 9px 14px; text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7); white-space: nowrap; }
+  .topic-table th.r { text-align: right; }
+  .topic-table td { padding: 10px 14px; border-bottom: 0.5px solid #f0ede6; color: #1a1a18; vertical-align: middle; }
+  .topic-table tr:last-child td { border-bottom: none; }
+  .topic-table tr:nth-child(even) td { background: #fafaf7; }
+  .topic-table tr:hover td { background: #f0ede6; }
+  .td-r { text-align: right; font-variant-numeric: tabular-nums; font-size: 12.5px; color: #444; }
+  .td-rank { font-size: 11px; color: #aaa; width: 28px; }
+  .code-chip { display: inline-block; font-size: 11px; font-weight: 600; font-family: 'SF Mono','Fira Mono',monospace; background: #eef4f0; color: #1a3a2a; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+  .td-name { font-weight: 500; font-size: 13px; color: #1a1a18; }
+  .dup-note { font-size: 10px; color: #9a5c00; font-weight: 400; margin-left: 5px; }
+  .one-send-badge { font-size: 9px; font-weight: 600; background: #fef3e2; color: #7a4800; padding: 1px 5px; border-radius: 3px; margin-left: 5px; letter-spacing: 0.02em; vertical-align: middle; }
 
-  .flag-card { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
-  .flag-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
-  .flag-dot.red { background: #c0392b; }
-  .flag-dot.amber { background: #d4860a; }
-  .flag-dot.green { background: #3d7a5a; }
-  .flag-title { font-size: 13.5px; font-weight: 500; color: #1a1a18; margin-bottom: 3px; line-height: 1.4; }
-  .flag-meta { font-size: 12px; color: #888; }
-  .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; margin: 4px 4px 0 0; letter-spacing: 0.02em; }
-  .tag-shift { background: #fde8e4; color: #8b2a1a; }
-  .tag-new   { background: #e3eef9; color: #14508a; }
-  .tag-spike { background: #fef3e2; color: #7a4800; }
-  .tag-ad    { background: #e6f2e8; color: #245c30; }
+  .bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .bar-track { width: 80px; height: 5px; background: #e2e0d8; border-radius: 3px; flex-shrink: 0; }
+  .bar-fill { height: 5px; border-radius: 3px; background: #1a3a2a; transition: width 0.3s ease; }
+  .bar-amt { font-size: 12.5px; font-weight: 500; color: #1a1a18; white-space: nowrap; }
 
-  .email-list { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; overflow: hidden; }
-  .email-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid #f0ede6; }
-  .email-row:last-child { border-bottom: none; }
-  .email-row:hover { background: #fafaf7; }
-  .email-sender { font-size: 13px; font-weight: 500; color: #1a1a18; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .email-subject { font-size: 12px; color: #888; margin-top: 2px; }
-  .email-time { font-size: 11px; color: #aaa; white-space: nowrap; margin-left: 12px; flex-shrink: 0; }
+  /* SMS mini */
+  .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 700px) { .split-grid { grid-template-columns: 1fr; } }
+  .mini-wrap { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; overflow: hidden; }
+  .mini-head { background: #1a3a2a; padding: 9px 14px; display: flex; justify-content: space-between; align-items: center; }
+  .mini-head-title { font-size: 11px; font-weight: 600; color: #fff; letter-spacing: 0.03em; text-transform: uppercase; }
+  .mini-head-count { font-size: 10px; color: rgba(255,255,255,0.5); }
+  .mini-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .mini-table td { padding: 9px 14px; border-bottom: 0.5px solid #f0ede6; color: #1a1a18; vertical-align: middle; }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table tr:nth-child(even) td { background: #fafaf7; }
+  .mini-table tr:hover td { background: #f0ede6; }
+  .mt-rank { font-size: 11px; color: #aaa; width: 22px; }
+  .mt-name { font-weight: 500; font-size: 12.5px; color: #1a1a18; }
+  .mt-sends { font-size: 11px; color: #888; text-align: right; }
+  .mt-avg { font-size: 12.5px; font-weight: 500; color: #1a1a18; text-align: right; white-space: nowrap; }
 
-  .dive-section { margin-top: 1.75rem; }
-  .dive-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #aaa; margin-bottom: 10px; }
-  .dive-btn { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 8px; padding: 12px 16px; font-size: 13px; cursor: pointer; color: #1a1a18; text-align: left; font-family: inherit; display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px; }
-  .dive-btn:hover { background: #f5f4f0; border-color: #c8c4b8; }
-  .dive-btn-body { flex: 1; }
-  .dive-btn-title { font-weight: 500; margin-bottom: 2px; }
-  .dive-btn-sub { font-size: 11.5px; color: #888; }
-  .dive-arrow { color: #1a3a2a; font-size: 15px; flex-shrink: 0; margin-left: 14px; font-weight: 600; }
+  /* client cards */
+  .client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 10px; }
+  .client-wrap { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; overflow: hidden; }
+  .client-head { background: #1a3a2a; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+  .client-name { font-size: 11px; font-weight: 600; color: #fff; letter-spacing: 0.04em; text-transform: uppercase; }
+  .client-sends { font-size: 10px; color: rgba(255,255,255,0.45); }
 
-  .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
-  .filter-btn { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 6px; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #555; font-family: inherit; }
-  .filter-btn:hover { border-color: #aaa; }
-  .filter-btn.active { background: #1a3a2a; color: #fff; border-color: #1a3a2a; }
-
-  .divider { height: 0.5px; background: #e2e0d8; margin: 1.5rem 0; }
-
-  /* Subscription list styles */
-  .sub-section-head { font-size: 13px; font-weight: 600; color: #1a1a18; margin: 1.75rem 0 6px; }
-  .sub-section-head:first-child { margin-top: 0; }
-  .sub-context { font-size: 12px; color: #2d5a3d; line-height: 1.6; margin-bottom: 10px; padding: 8px 12px; border-left: 3px solid #1a3a2a; background: #eef4f0; border-radius: 0 6px 6px 0; }
-  .sub-context.watch { border-left-color: #8b2a1a; background: #f7f0f0; color: #5a2020; }
-  .sub-table-wrap { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; overflow: hidden; margin-bottom: 4px; }
-  .sub-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  .sub-table th { background: #1a3a2a; color: #fff; font-weight: 600; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 14px; text-align: left; }
-  .sub-table th.rh { background: #6b2020; }
-  .sub-table td { padding: 9px 14px; border-bottom: 0.5px solid #f0ede6; vertical-align: middle; color: #1a1a18; line-height: 1.5; }
-  .sub-table tr:last-child td { border-bottom: none; }
-  .sub-table tr:nth-child(even) td { background: #fafaf8; }
-  .url-cell { white-space: nowrap; }
-  .url-link { color: #1a3a2a; text-decoration: none; font-size: 11.5px; font-family: 'SF Mono', 'Fira Mono', 'Courier New', monospace; background: #f0f4f1; padding: 3px 7px; border-radius: 4px; display: inline-block; }
-  .url-link:hover { background: #d8ece0; text-decoration: underline; }
-  .side-d { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: #e3eef9; color: #14508a; }
-  .side-r { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: #fde8e4; color: #8b2a1a; }
-  .cost-free { color: #2d6a3a; font-weight: 600; font-size: 11.5px; }
-  .cost-paid { color: #7a4800; font-weight: 600; font-size: 11.5px; }
-  .new-hire-badge { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; background: #1a3a2a; color: #fff; letter-spacing: 0.04em; margin-left: 6px; vertical-align: middle; }
+  .note-card { background: #fff; border: 0.5px solid #e2e0d8; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; font-size: 12.5px; color: #555; line-height: 1.6; }
+  .note-card strong { color: #1a1a18; font-weight: 500; }
+  .empty-note { padding: 24px; text-align: center; font-size: 13px; color: #aaa; }
 </style>
 </head>
 <body>
@@ -122,427 +96,699 @@
   <div class="header">
     <div class="logo">
       <div class="logo-dot"></div>
-      <div class="title">PAC Intel Daily Digest</div>
+      <div class="title">Topic Performance Report</div>
     </div>
-    <div class="datestamp">Monday, April 28, 2026 · 7:04 AM</div>
+    <div class="header-right">
+      <div class="date-toggle">
+        <button class="dtb" onclick="setWindow(7,this)">7d</button>
+        <button class="dtb" onclick="setWindow(14,this)">14d</button>
+        <button class="dtb on" onclick="setWindow(30,this)">30d</button>
+        <button class="dtb" onclick="setWindow(60,this)">60d</button>
+        <button class="dtb" onclick="setWindow(90,this)">90d</button>
+      </div>
+      <div class="datestamp" id="datestamp">Mar 30 – Apr 29, 2026 · 31 clients</div>
+    </div>
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="stat-label">Emails</div><div class="stat-val">31</div></div>
-    <div class="stat"><div class="stat-label">Trending topics</div><div class="stat-val">4</div></div>
-    <div class="stat"><div class="stat-label">GOP spend signals</div><div class="stat-val red">4</div></div>
-    <div class="stat"><div class="stat-label">New senders</div><div class="stat-val amber">1</div></div>
+    <div class="stat"><div class="stat-label">EM sends</div><div class="stat-val" id="s-em">417</div></div>
+    <div class="stat"><div class="stat-label">SMS sends</div><div class="stat-val" id="s-sms">30</div></div>
+    <div class="stat"><div class="stat-label">Unique topics (EM)</div><div class="stat-val" id="s-topics">141</div></div>
+    <div class="stat"><div class="stat-label">Active clients</div><div class="stat-val" id="s-clients">4</div></div>
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="showTab('trends', this)">Messaging trends</button>
-    <button class="tab" onclick="showTab('gop', this)">GOP spend intel</button>
-    <button class="tab" onclick="showTab('flags', this)">Other flags</button>
-    <button class="tab" onclick="showTab('all', this)">All emails</button>
-    <button class="tab" onclick="showTab('sublist', this)">Subscription list</button>
+    <button class="tab active" onclick="showTab('em',this)">Email topics</button>
+    <button class="tab" onclick="showTab('sms',this)">SMS topics</button>
+    <button class="tab" onclick="showTab('clients',this)">By client</button>
   </div>
 
-  <!-- MESSAGING TRENDS -->
-  <div id="trends" class="tab-panel active">
-    <div class="section-label">D-side · trending topics this week</div>
-
-    <div class="trend-card">
-      <div class="trend-card-header">
-        <div class="trend-topic">"Accountability" replacing "extreme" as the dominant attack frame</div>
-        <div class="trend-heat">
-          <div class="heat-bar"><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip"></div></div>
-          <div class="heat-count">11 emails · 4 days</div>
-        </div>
-      </div>
-      <div class="trend-angle">Priorities USA, DCCC, House Majority PAC, Progressive Turnout Project, and Bold PAC have all shifted from "extreme/extremist" language to "accountability" framing this week. Less about labeling Republicans and more about holding them responsible for specific votes — healthcare, Social Security, abortion access. The breadth of senders suggests this is a coordinated ecosystem pivot.</div>
-      <div class="trend-senders"><strong>Senders:</strong> Priorities USA, DCCC, House Majority PAC, Progressive Turnout Project, Bold PAC, American Bridge</div>
-      <div class="trend-examples">
-        <div class="example-line">"It's time to hold them accountable for gutting Medicaid" — Priorities USA, 4/27</div>
-        <div class="example-line">"Accountability starts at the ballot box" — DCCC, 4/26</div>
-        <div class="example-line">"No more excuses. No more delays. Accountability." — Progressive Turnout Project, 4/26</div>
-        <div class="example-line">"No accountability, no majority" — House Majority PAC, 4/25</div>
-      </div>
-    </div>
-
-    <div class="trend-card">
-      <div class="trend-card-header">
-        <div class="trend-topic">Medicaid cuts as primary mobilization hook — two distinct angles emerging</div>
-        <div class="trend-heat">
-          <div class="heat-bar"><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip"></div></div>
-          <div class="heat-count">9 emails · 5 days</div>
-        </div>
-      </div>
-      <div class="trend-angle">Medicaid is the specific policy vehicle — not "healthcare" broadly. End Citizens United and Defend the Vote are framing it as a corruption angle ("gutting care to fund tax cuts for donors"), while Care in Action and DSCC are going constituent-impact. Worth watching which angle performs better in your clients' A/B tests.</div>
-      <div class="trend-senders"><strong>Senders:</strong> DSCC, Care in Action, Senate Majority PAC, DCCC, End Citizens United, Defend the Vote</div>
-      <div class="trend-examples">
-        <div class="example-line">"$880 billion in Medicaid cuts. Real people. Real harm." — DSCC, 4/27</div>
-        <div class="example-line">"They're cutting Medicaid to give tax breaks to their donors. That's corruption." — End Citizens United, 4/26</div>
-        <div class="example-line">"Home care workers will lose their jobs. Their clients will lose their care." — Care in Action, 4/26</div>
-      </div>
-    </div>
-
-    <div class="trend-card">
-      <div class="trend-card-header">
-        <div class="trend-topic">FEC deadline urgency — end-of-quarter volume spike</div>
-        <div class="trend-heat">
-          <div class="heat-bar"><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip on"></div></div>
-          <div class="heat-count">14 emails · 3 days</div>
-        </div>
-      </div>
-      <div class="trend-angle">Q1 FEC deadline Friday. Almost every D-side org is in full fundraising mode — subject lines leaning on deadline urgency, matching gift offers, and donor count framing. NDTC sent two deadline emails today alone. Not a messaging pivot, but volume is at a weekly high across the board.</div>
-      <div class="trend-senders"><strong>Senders:</strong> DCCC, DNC, DSCC, EMILY's List, Senate Majority PAC, Run for Something, NDTC, Elect Democratic Women, Bold PAC</div>
-      <div class="trend-examples">
-        <div class="example-line">"Hours left. Will you be one of our 500 donors before midnight?" — DCCC, 4/27</div>
-        <div class="example-line">"Our FEC report goes public Friday. Don't let it tell the wrong story." — DNC, 4/26</div>
-        <div class="example-line">"We're 47 donors short. Can you be #48?" — NDTC, 4/27</div>
-      </div>
-    </div>
-
-    <div class="trend-card">
-      <div class="trend-card-header">
-        <div class="trend-topic">AI in political advertising — trade press and legal orgs both watching</div>
-        <div class="trend-heat">
-          <div class="heat-bar"><div class="heat-pip on"></div><div class="heat-pip on"></div><div class="heat-pip"></div><div class="heat-pip"></div><div class="heat-pip"></div></div>
-          <div class="heat-count">4 emails · 7 days</div>
-        </div>
-      </div>
-      <div class="trend-angle">C&E focused on speed advantage, AdImpact flagged buy data gaps for AI-generated placements, and Democracy Forward sent a note on FEC disclosure rule uncertainty for AI creative. Two different worlds — industry and legal — landing on the same issue from different angles. Disclosure is the emerging pressure point.</div>
-      <div class="trend-senders"><strong>Senders:</strong> Campaigns & Elections, AdImpact Newsletter, Politico Playbook, Democracy Forward</div>
-      <div class="trend-examples">
-        <div class="example-line">"The campaigns using AI creative in 2026 are moving faster than compliance can keep up" — C&E, 4/27</div>
-        <div class="example-line">"FEC disclosure rules for AI-generated ads remain dangerously unclear" — Democracy Forward, 4/25</div>
-      </div>
-    </div>
-
-    <div class="dive-section">
-      <div class="dive-label">Ask Claude to go deeper</div>
-      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
-        <div class="dive-btn-body"><div class="dive-btn-title">Summarize D-side messaging trends this week across all emails</div><div class="dive-btn-sub">Full analysis with examples, pivot points, and what to watch next week</div></div>
-        <div class="dive-arrow">↗</div>
-      </button>
-      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
-        <div class="dive-btn-body"><div class="dive-btn-title">Is the "accountability" pivot coordinated? Compare timing across senders</div><div class="dive-btn-sub">Look for same-day sends, shared language, likely origin</div></div>
-        <div class="dive-arrow">↗</div>
-      </button>
-      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
-        <div class="dive-btn-body"><div class="dive-btn-title">What creative angles are D-side PACs using on Medicaid right now?</div><div class="dive-btn-sub">Compare the corruption frame vs. constituent-impact frame — pull all examples</div></div>
-        <div class="dive-arrow">↗</div>
-      </button>
+  <div id="em" class="tab-panel active">
+    <div class="context-bar" id="em-ctx">Topic1 and topic2 combined across both originals and resends — sorted by average raised. Single-send topics are included and flagged. <strong>↕ ambiguous code</strong> means two different topic names share the same abbreviation in the lookup.</div>
+    <div class="table-wrap">
+      <table class="topic-table">
+        <thead><tr>
+          <th>#</th><th>Code</th><th>Topic</th>
+          <th class="r">Sends</th>
+          <th>Avg raised</th>
+          <th class="r">Median</th>
+          <th class="r">Max</th>
+          <th class="r">Total raised</th>
+        </tr></thead>
+        <tbody id="tb-em"></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- GOP SPEND INTEL -->
-  <div id="gop" class="tab-panel">
-    <div class="section-label">Where Republicans are spending — good fodder for your emails</div>
-
-    <div class="spend-card">
-      <div class="spend-header">
-        <div class="spend-title">NRCC buying in OH-07, PA-08, AZ-01 — three Frontline districts at once</div>
-        <div class="spend-source">NRCC · 6:12 AM</div>
-      </div>
-      <div class="spend-detail">Email footer named media vendors in all three districts. Unusual for April — suggests early pressure campaign. OH-07 and PA-08 are both on the DCCC Frontline list. Progressive Turnout Project and Hold the Line are both active in OH-07, so there's already D-side infrastructure there to coordinate with.</div>
-      <div class="spend-fodder">
-        <div class="spend-fodder-label">Fodder for your emails</div>
-        Republicans are already on air in these districts months ahead of last cycle. If clients are in OH-07 or PA-08, this is the justification to get on air now — frame the race before R-side ads define the landscape.
-      </div>
-    </div>
-
-    <div class="spend-card">
-      <div class="spend-header">
-        <div class="spend-title">Senate Leadership Fund pairing Georgia and Michigan in same email — unusual</div>
-        <div class="spend-source">Senate Leadership Fund · 5:22 AM</div>
-      </div>
-      <div class="spend-detail">SLF hasn't historically grouped these two states together. Suggests simultaneous resource allocation — possibly reacting to Ossoff's strong Q1 or signaling a Michigan pickup attempt. Hold the Line sent a counter-message on Georgia the same morning, which may be a direct response.</div>
-      <div class="spend-fodder">
-        <div class="spend-fodder-label">Fodder for your emails</div>
-        When the opposition names your client's race in their fundraising, it's validation. "Even Republicans know this seat is in play" is a strong urgency frame for donor emails in both states.
-      </div>
-    </div>
-
-    <div class="spend-card">
-      <div class="spend-header">
-        <div class="spend-title">Club for Growth previewing 6 primary targets — three overlap with DCCC expansion map</div>
-        <div class="spend-source">Club for Growth Action · 1:22 AM</div>
-      </div>
-      <div class="spend-detail">Named six safe-R districts for primary intervention. Three overlap with DCCC's 2026 expansion map. End Citizens United flagged CfG's involvement in two of the same races this week, framing it as dark money interference — that's a counter-narrative already in motion.</div>
-      <div class="spend-fodder">
-        <div class="spend-fodder-label">Fodder for your emails</div>
-        R primaries moving right = more extreme general election opponents. "They chose the most extreme candidate" is a ready-made fall frame. ECU is already using it — worth coordinating the angle with clients in those districts.
-      </div>
-    </div>
-
-    <div class="spend-card">
-      <div class="spend-header">
-        <div class="spend-title">Trump / Save America — 5 emails in 4 days, volume spike</div>
-        <div class="spend-source">Trump / Save America · ongoing</div>
-      </div>
-      <div class="spend-detail">All five leaning into federal agency news and "witch hunt" framing. Subject line formula is consistent: urgent hook + dollar ask + countdown. D-side counter-messaging typically follows Trump's news cycle within 24–48 hours — this week that means agency/DOJ content is coming from D clients shortly.</div>
-      <div class="spend-fodder">
-        <div class="spend-fodder-label">Fodder for your emails</div>
-        Trump's fundraising emails are the fastest leading indicator of what the D-side will respond to next. What he sends Monday, your clients will want to counter by Wednesday. Subscribe and read before your morning briefings.
-      </div>
-    </div>
-
-    <div class="dive-section">
-      <div class="dive-label">Ask Claude to go deeper</div>
-      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
-        <div class="dive-btn-body"><div class="dive-btn-title">Where is R-side money moving this week vs. last week?</div><div class="dive-btn-sub">Track geographic shifts across NRCC, SLF, CLF, and CfG emails</div></div>
-        <div class="dive-arrow">↗</div>
-      </button>
-      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
-        <div class="dive-btn-body"><div class="dive-btn-title">Draft a donor email using the NRCC OH-07 buy as urgency fodder</div><div class="dive-btn-sub">Frame: Republicans are already on air, we need to match them now</div></div>
-        <div class="dive-arrow">↗</div>
-      </button>
-      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
-        <div class="dive-btn-body"><div class="dive-btn-title">Summarize Trump's email themes this week for a D-side counter-brief</div><div class="dive-btn-sub">Pull subject lines and key frames — what will D clients respond to next?</div></div>
-        <div class="dive-arrow">↗</div>
-      </button>
+  <div id="sms" class="tab-panel">
+    <div class="note-card" id="sms-note"><strong>SMS context:</strong> Topic1 and topic2 combined across originals and resends.</div>
+    <div class="table-wrap">
+      <table class="topic-table">
+        <thead><tr>
+          <th>#</th><th>Code</th><th>Topic</th>
+          <th class="r">Sends</th>
+          <th>Avg raised</th>
+          <th class="r">Median</th>
+          <th class="r">Max</th>
+          <th class="r">Total raised</th>
+        </tr></thead>
+        <tbody id="tb-sms"></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- OTHER FLAGS -->
-  <div id="flags" class="tab-panel">
-    <div class="section-label">Flags</div>
-
-    <div class="flag-card">
-      <div class="flag-dot red"></div>
-      <div>
-        <div class="flag-title">New PAC registered — "Forward Together PAC" — first email received</div>
-        <div class="flag-meta">Not in FEC database as of last week. Origin unclear — potential new client. · 4:33 AM</div>
-        <span class="tag tag-new">New sender</span>
-      </div>
-    </div>
-
-    <div class="flag-card">
-      <div class="flag-dot amber"></div>
-      <div>
-        <div class="flag-title">James Talarico (TX-21) — first fundraising email of the cycle</div>
-        <div class="flag-meta">Frontrunning D challenger ramping up. First email is a signal — good moment for an early outreach. · 9:15 PM</div>
-        <span class="tag tag-new">Challenger ramp-up</span>
-      </div>
-    </div>
-
-    <div class="flag-card">
-      <div class="flag-dot amber"></div>
-      <div>
-        <div class="flag-title">FEC Notifications: 3 new PAC registrations filed</div>
-        <div class="flag-meta">New entrants into the cycle — cross-reference against known D-aligned donors. · 11:45 PM</div>
-        <span class="tag tag-new">New PACs</span>
-      </div>
-    </div>
-
-    <div class="flag-card">
-      <div class="flag-dot amber"></div>
-      <div>
-        <div class="flag-title">Cook Political Report: 3 race ratings moved this week</div>
-        <div class="flag-meta">Any Toss-Up or Lean D movement affects where client dollars go. · 2:00 AM</div>
-      </div>
-    </div>
-
-    <div class="flag-card">
-      <div class="flag-dot green"></div>
-      <div>
-        <div class="flag-title">OpenSecrets: Q1 outside spending data published</div>
-        <div class="flag-meta">Full IE dataset live — useful for client briefings on where D money flowed. · 3:15 AM</div>
-      </div>
-    </div>
-
-    <div class="dive-section">
-      <div class="dive-label">Ask Claude to go deeper</div>
-      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
-        <div class="dive-btn-body"><div class="dive-btn-title">Research Forward Together PAC — who might be behind it?</div><div class="dive-btn-sub">Cross-reference FEC filings, donor patterns, and known D-aligned orgs</div></div>
-        <div class="dive-arrow">↗</div>
-      </button>
-      <button class="dive-btn" onclick="alert('In the live version, this sends the prompt to Claude.')">
-        <div class="dive-btn-body"><div class="dive-btn-title">Which Cook rating changes affect active client races?</div><div class="dive-btn-sub">Flag any movement in seats where D-side clients are currently spending</div></div>
-        <div class="dive-arrow">↗</div>
-      </button>
-    </div>
-  </div>
-
-  <!-- ALL EMAILS -->
-  <div id="all" class="tab-panel">
-    <div class="filter-row">
-      <button class="filter-btn active" onclick="filterEmails('all', this)">All 31</button>
-      <button class="filter-btn" onclick="filterEmails('dside', this)">D-side</button>
-      <button class="filter-btn" onclick="filterEmails('watch', this)">R-side watch</button>
-      <button class="filter-btn" onclick="filterEmails('news', this)">Industry</button>
-      <button class="filter-btn" onclick="filterEmails('flag', this)">Flagged</button>
-    </div>
-    <div class="email-list" id="emailList">
-      <div class="email-row" data-type="dside flag"><div><div class="email-sender">DCCC <span class="tag tag-spike">spike</span></div><div class="email-subject">2026 PRIORITIES SURVEY ENCLOSED</div></div><div class="email-time">7:01 AM</div></div>
-      <div class="email-row" data-type="watch flag"><div><div class="email-sender">NRCC <span class="tag tag-ad">R ad buy</span></div><div class="email-subject">New ad buys announced — key districts</div></div><div class="email-time">6:12 AM</div></div>
-      <div class="email-row" data-type="dside flag"><div><div class="email-sender">Priorities USA <span class="tag tag-shift">shift</span></div><div class="email-subject">Holding Republicans accountable</div></div><div class="email-time">5:47 AM</div></div>
-      <div class="email-row" data-type="watch flag"><div><div class="email-sender">Senate Leadership Fund <span class="tag tag-spike">watch</span></div><div class="email-subject">Why Georgia and Michigan matter</div></div><div class="email-time">5:22 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">EMILY's List</div><div class="email-subject">Our candidates need you now</div></div><div class="email-time">4:55 AM</div></div>
-      <div class="email-row" data-type="dside flag"><div><div class="email-sender">Forward Together PAC <span class="tag tag-new">new</span></div><div class="email-subject">Join us in 2026</div></div><div class="email-time">4:33 AM</div></div>
-      <div class="email-row" data-type="watch"><div><div class="email-sender">Congressional Leadership Fund</div><div class="email-subject">The stakes this November</div></div><div class="email-time">4:21 AM</div></div>
-      <div class="email-row" data-type="news flag"><div><div class="email-sender">Campaigns &amp; Elections</div><div class="email-subject">AI creative tools are reshaping political ads</div></div><div class="email-time">4:00 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">End Citizens United</div><div class="email-subject">They're using dark money to gut Medicaid</div></div><div class="email-time">3:55 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">DSCC</div><div class="email-subject">Senate update: where we stand</div></div><div class="email-time">3:47 AM</div></div>
-      <div class="email-row" data-type="news flag"><div><div class="email-sender">OpenSecrets</div><div class="email-subject">Q1 outside spending data now live</div></div><div class="email-time">3:15 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">Progressive Turnout Project</div><div class="email-subject">No more excuses. Accountability.</div></div><div class="email-time">3:05 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">DNC</div><div class="email-subject">Weekend momentum report</div></div><div class="email-time">2:58 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">House Majority PAC</div><div class="email-subject">These 6 seats decide everything</div></div><div class="email-time">2:44 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">Bold PAC</div><div class="email-subject">Hold them accountable this cycle</div></div><div class="email-time">2:38 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">American Bridge</div><div class="email-subject">Opposition research drop</div></div><div class="email-time">2:31 AM</div></div>
-      <div class="email-row" data-type="news flag"><div><div class="email-sender">Cook Political Report</div><div class="email-subject">Race rating changes: 3 seats move</div></div><div class="email-time">2:00 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">Defend the Vote</div><div class="email-subject">Election integrity update — 3 states</div></div><div class="email-time">1:55 AM</div></div>
-      <div class="email-row" data-type="watch"><div><div class="email-sender">NRSC</div><div class="email-subject">Senate recruitment update</div></div><div class="email-time">1:45 AM</div></div>
-      <div class="email-row" data-type="watch flag"><div><div class="email-sender">Club for Growth Action</div><div class="email-subject">Primary season preview</div></div><div class="email-time">1:22 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">Hold the Line PAC</div><div class="email-subject">Georgia is on the line</div></div><div class="email-time">1:15 AM</div></div>
-      <div class="email-row" data-type="watch flag"><div><div class="email-sender">Trump / Save America <span class="tag tag-spike">spike</span></div><div class="email-subject">They're coming after us again</div></div><div class="email-time">1:10 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">Senate Majority PAC</div><div class="email-subject">Our path to 51 seats</div></div><div class="email-time">12:55 AM</div></div>
-      <div class="email-row" data-type="news"><div><div class="email-sender">Politico Playbook</div><div class="email-subject">Monday morning: what to watch</div></div><div class="email-time">12:30 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">DCCC Frontline</div><div class="email-subject">Frontline member update</div></div><div class="email-time">12:15 AM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">NDTC</div><div class="email-subject">We're 47 donors short — FEC deadline Friday</div></div><div class="email-time">12:10 AM</div></div>
-      <div class="email-row" data-type="news"><div><div class="email-sender">Sabato's Crystal Ball</div><div class="email-subject">Weekly race roundup</div></div><div class="email-time">12:00 AM</div></div>
-      <div class="email-row" data-type="dside flag"><div><div class="email-sender">James Talarico (TX-21) <span class="tag tag-new">challenger</span></div><div class="email-subject">I'm running — and we can win this</div></div><div class="email-time">9:15 PM</div></div>
-      <div class="email-row" data-type="dside"><div><div class="email-sender">Elect Democratic Women</div><div class="email-subject">Meet the women running in 2026</div></div><div class="email-time">11:50 PM</div></div>
-      <div class="email-row" data-type="news flag"><div><div class="email-sender">FEC Notifications <span class="tag tag-new">new PACs</span></div><div class="email-subject">New PAC registrations: 3 filed</div></div><div class="email-time">11:45 PM</div></div>
-      <div class="email-row" data-type="news"><div><div class="email-sender">The Morning Score</div><div class="email-subject">Campaign finance weekly</div></div><div class="email-time">11:30 PM</div></div>
-    </div>
-  </div>
-
-  <!-- SUBSCRIPTION LIST -->
-  <div id="sublist" class="tab-panel">
-
-    <div class="sub-section-head">New Hire Baseline <span class="new-hire-badge">DAY ONE</span></div>
-    <div class="sub-context">Every new hire subscribes to this list first. It is the floor, not the ceiling.</div>
-    <div class="sub-table-wrap">
-      <table class="sub-table">
-        <thead><tr><th>Organization</th><th>Side</th><th>Signup URL</th></tr></thead>
-        <tbody>
-          <tr><td>Progressive Turnout Project</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://progressiveturnout.org" target="_blank">progressiveturnout.org</a></td></tr>
-          <tr><td>End Citizens United</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://endcitizensunited.org" target="_blank">endcitizensunited.org</a></td></tr>
-          <tr><td>Natl Democratic Training Committee</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://traindemocrats.org" target="_blank">traindemocrats.org</a></td></tr>
-          <tr><td>Elect Democratic Women</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://electdemocraticwomen.com" target="_blank">electdemocraticwomen.com</a></td></tr>
-          <tr><td>Bold PAC</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://boldpac.com" target="_blank">boldpac.com</a></td></tr>
-          <tr><td>EMILY's List</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://emilyslist.org" target="_blank">emilyslist.org</a></td></tr>
-          <tr><td>DNC</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://democrats.org/get-involved/" target="_blank">democrats.org/get-involved/</a></td></tr>
-          <tr><td>DCCC</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://dccc.org" target="_blank">dccc.org</a></td></tr>
-          <tr><td>DSCC</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://dscc.org" target="_blank">dscc.org</a></td></tr>
-          <tr><td>RNC</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://gop.com" target="_blank">gop.com</a></td></tr>
-          <tr><td>Trump / Save America</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://donaldjtrump.com/email" target="_blank">donaldjtrump.com/email</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="sub-section-head">Full D-Side PACs &amp; Outside Groups</div>
-    <div class="sub-context">Core client universe and warm prospects. Watching these tells you what clients are emphasizing now — and what they'll ask you to build next.</div>
-    <div class="sub-table-wrap">
-      <table class="sub-table">
-        <thead><tr><th>Organization</th><th>Focus</th><th>Signup URL</th></tr></thead>
-        <tbody>
-          <tr><td>Priorities USA</td><td>Largest Dem super PAC</td><td class="url-cell"><a class="url-link" href="https://prioritiesusa.org/contact/" target="_blank">prioritiesusa.org/contact/</a></td></tr>
-          <tr><td>Senate Majority PAC</td><td>Senate-focused IE spending</td><td class="url-cell"><a class="url-link" href="https://senatemajoritypac.com" target="_blank">senatemajoritypac.com</a></td></tr>
-          <tr><td>House Majority PAC</td><td>House-focused IE spending</td><td class="url-cell"><a class="url-link" href="https://housemajoritypac.com" target="_blank">housemajoritypac.com</a></td></tr>
-          <tr><td>American Bridge 21st C.</td><td>Opposition research / rapid response</td><td class="url-cell"><a class="url-link" href="https://americanbridgepac.org" target="_blank">americanbridgepac.org</a></td></tr>
-          <tr><td>Defend the Vote</td><td>Election protection / voting rights</td><td class="url-cell"><a class="url-link" href="https://defendthevote.com" target="_blank">defendthevote.com</a></td></tr>
-          <tr><td>Hold the Line PAC</td><td>Anti-MAGA accountability</td><td class="url-cell"><a class="url-link" href="https://holdthelinepac.com" target="_blank">holdthelinepac.com</a></td></tr>
-          <tr><td>ACLU</td><td>Civil liberties / mobilization</td><td class="url-cell"><a class="url-link" href="https://aclu.org/subscribe" target="_blank">aclu.org/subscribe</a></td></tr>
-          <tr><td>Democracy Forward</td><td>Legal accountability / litigation comms</td><td class="url-cell"><a class="url-link" href="https://democracyforward.org" target="_blank">democracyforward.org</a></td></tr>
-          <tr><td>Care in Action</td><td>Domestic workers advocacy PAC</td><td class="url-cell"><a class="url-link" href="https://careinaction.org" target="_blank">careinaction.org</a></td></tr>
-          <tr><td>Congressional Progressive Caucus PAC</td><td>Progressive House members</td><td class="url-cell"><a class="url-link" href="https://progressivecaucuspac.org" target="_blank">progressivecaucuspac.org</a></td></tr>
-          <tr><td>SEIU</td><td>Labor IE spending</td><td class="url-cell"><a class="url-link" href="https://seiu.org" target="_blank">seiu.org</a></td></tr>
-          <tr><td>Latino Victory</td><td>Latino candidate and voter focus</td><td class="url-cell"><a class="url-link" href="https://latinovictory.us" target="_blank">latinovictory.us</a></td></tr>
-          <tr><td>Run for Something</td><td>Down-ballot progressive recruitment</td><td class="url-cell"><a class="url-link" href="https://runforsomething.net" target="_blank">runforsomething.net</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="sub-section-head">Key Candidates — D + R</div>
-    <div class="sub-context">D incumbents and frontrunning challengers for messaging intel; key R candidates for counter-messaging fodder. Subscribe via campaign websites.</div>
-    <div class="sub-table-wrap">
-      <table class="sub-table">
-        <thead><tr><th>Candidate</th><th>Race</th><th>Side</th><th>Signup URL</th></tr></thead>
-        <tbody>
-          <tr><td>Sen. Jon Ossoff</td><td>GA Senate</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://ossoff.senate.gov" target="_blank">ossoff.senate.gov</a></td></tr>
-          <tr><td>Rep. Chris Pappas</td><td>NH-01 / Senate?</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://chrispappas.org" target="_blank">chrispappas.org</a></td></tr>
-          <tr><td>James Talarico</td><td>TX-21 Challenger</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://talarico.house.gov" target="_blank">talarico.house.gov</a></td></tr>
-          <tr><td>Rep. Ruben Gallego</td><td>AZ Senate</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://rubengallego.com" target="_blank">rubengallego.com</a></td></tr>
-          <tr><td>DCCC Frontline members</td><td>26 D seats</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://dccc.org/frontline" target="_blank">dccc.org/frontline</a></td></tr>
-          <tr><td>DCCC Red to Blue</td><td>Challenger list</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://dccc.org/redtoblue" target="_blank">dccc.org/redtoblue</a></td></tr>
-          <tr><td>Sen. Ted Cruz</td><td>TX Senate</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://tedcruz.org" target="_blank">tedcruz.org</a></td></tr>
-          <tr><td>Sen. Thom Tillis</td><td>NC Senate</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://thomtillis.com" target="_blank">thomtillis.com</a></td></tr>
-          <tr><td>Trump / Save America</td><td>National</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://donaldjtrump.com/email" target="_blank">donaldjtrump.com/email</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="sub-section-head">State Parties — Priority States</div>
-    <div class="sub-context">State parties surface down-ballot races and coordinated messaging before it shows up nationally. Both D and R sides for counter-messaging intel.</div>
-    <div class="sub-table-wrap">
-      <table class="sub-table">
-        <thead><tr><th>State Party</th><th>State</th><th>Side</th><th>Signup URL</th></tr></thead>
-        <tbody>
-          <tr><td>Georgia Democratic Party</td><td>GA</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://georgiademocrat.org" target="_blank">georgiademocrat.org</a></td></tr>
-          <tr><td>Texas Democratic Party</td><td>TX</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://txdemocrats.org" target="_blank">txdemocrats.org</a></td></tr>
-          <tr><td>Florida Democratic Party</td><td>FL</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://floridadems.org" target="_blank">floridadems.org</a></td></tr>
-          <tr><td>Ohio Democratic Party</td><td>OH</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://ohiodems.org" target="_blank">ohiodems.org</a></td></tr>
-          <tr><td>NC Democratic Party</td><td>NC</td><td><span class="side-d">D</span></td><td class="url-cell"><a class="url-link" href="https://ncdp.org" target="_blank">ncdp.org</a></td></tr>
-          <tr><td>Georgia Republican Party</td><td>GA</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://gagop.org" target="_blank">gagop.org</a></td></tr>
-          <tr><td>Texas Republican Party</td><td>TX</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://texasgop.org" target="_blank">texasgop.org</a></td></tr>
-          <tr><td>Florida Republican Party</td><td>FL</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://floridagop.org" target="_blank">floridagop.org</a></td></tr>
-          <tr><td>Ohio Republican Party</td><td>OH</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://ohiogop.org" target="_blank">ohiogop.org</a></td></tr>
-          <tr><td>NC Republican Party</td><td>NC</td><td><span class="side-r">R</span></td><td class="url-cell"><a class="url-link" href="https://ncgop.org" target="_blank">ncgop.org</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="sub-section-head">R-Side — Watch Only</div>
-    <div class="sub-context watch">Subscribe for counter-messaging intel and to track which D races are being targeted. Do not work for these orgs.</div>
-    <div class="sub-table-wrap">
-      <table class="sub-table">
-        <thead><tr><th class="rh">Organization</th><th class="rh">Why to Watch</th><th class="rh">Signup URL</th></tr></thead>
-        <tbody>
-          <tr><td>Club for Growth Action</td><td>Primary spending — watch for race signals</td><td class="url-cell"><a class="url-link" href="https://clubforgrowthaction.org" target="_blank">clubforgrowthaction.org</a></td></tr>
-          <tr><td>Congressional Leadership Fund</td><td>House GOP super PAC</td><td class="url-cell"><a class="url-link" href="https://congressionalleadershipfund.org" target="_blank">congressionalleadershipfund.org</a></td></tr>
-          <tr><td>Senate Leadership Fund</td><td>McConnell-aligned Senate battlefield tracking</td><td class="url-cell"><a class="url-link" href="https://senateleadershipfund.com" target="_blank">senateleadershipfund.com</a></td></tr>
-          <tr><td>MAGA Inc.</td><td>Sets national R message frame</td><td class="url-cell"><a class="url-link" href="https://magainc.com" target="_blank">magainc.com</a></td></tr>
-          <tr><td>NRCC</td><td>Targets D incumbents your clients defend</td><td class="url-cell"><a class="url-link" href="https://nrcc.org" target="_blank">nrcc.org</a></td></tr>
-          <tr><td>NRSC</td><td>Targets D senators your clients support</td><td class="url-cell"><a class="url-link" href="https://nrsc.org" target="_blank">nrsc.org</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="sub-section-head">Industry Publications &amp; Ad Intel</div>
-    <div class="sub-context">AdImpact tracks actual ad buys by race and platform. FEC Notification Service = new PAC filings = potential clients before they hire anyone.</div>
-    <div class="sub-table-wrap">
-      <table class="sub-table">
-        <thead><tr><th>Source</th><th>Type</th><th>Cost</th><th>Signup URL</th></tr></thead>
-        <tbody>
-          <tr><td>Campaigns &amp; Elections</td><td>Industry trade</td><td><span class="cost-free">Free</span></td><td class="url-cell"><a class="url-link" href="https://campaignsandelections.com/newsletter/" target="_blank">campaignsandelections.com/newsletter/</a></td></tr>
-          <tr><td>AdImpact Newsletter</td><td>Ad buy intel</td><td><span class="cost-free">Free</span></td><td class="url-cell"><a class="url-link" href="https://go.adimpact.com" target="_blank">go.adimpact.com</a></td></tr>
-          <tr><td>Politico Playbook</td><td>Daily news</td><td><span class="cost-free">Free</span></td><td class="url-cell"><a class="url-link" href="https://politico.com/playbook" target="_blank">politico.com/playbook</a></td></tr>
-          <tr><td>The Morning Score</td><td>Campaign finance</td><td><span class="cost-free">Free</span></td><td class="url-cell"><a class="url-link" href="https://politico.com/morningscore" target="_blank">politico.com/morningscore</a></td></tr>
-          <tr><td>Cook Political Report</td><td>Race analysis</td><td><span class="cost-paid">$35/mo</span></td><td class="url-cell"><a class="url-link" href="https://cookpolitical.com" target="_blank">cookpolitical.com</a></td></tr>
-          <tr><td>OpenSecrets Newsletter</td><td>Money in politics</td><td><span class="cost-free">Free</span></td><td class="url-cell"><a class="url-link" href="https://opensecrets.org/newsletter/signup-form" target="_blank">opensecrets.org/newsletter/signup-form</a></td></tr>
-          <tr><td>Sabato's Crystal Ball</td><td>Race forecasting</td><td><span class="cost-free">Free</span></td><td class="url-cell"><a class="url-link" href="https://centerforpolitics.org/crystalball/" target="_blank">centerforpolitics.org/crystalball/</a></td></tr>
-          <tr><td>Roll Call</td><td>Capitol Hill</td><td><span class="cost-free">Free</span></td><td class="url-cell"><a class="url-link" href="https://rollcall.com" target="_blank">rollcall.com</a></td></tr>
-          <tr><td>FEC Notification Service</td><td>Regulatory</td><td><span class="cost-free">Free</span></td><td class="url-cell"><a class="url-link" href="https://fec.gov/updates/" target="_blank">fec.gov/updates/</a></td></tr>
-          <tr><td>The Hotline</td><td>Daily briefing</td><td><span class="cost-paid">Paid</span></td><td class="url-cell"><a class="url-link" href="https://nationaljournal.com/hotline" target="_blank">nationaljournal.com/hotline</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-
+  <div id="clients" class="tab-panel">
+    <div class="context-bar">EM only (originals + resends combined, topic1 + topic2 merged). Sorted by avg raised per topic. Clients with no EM sends in the selected window are hidden.</div>
+    <div class="client-grid" id="client-grid"></div>
   </div>
 
 </div>
+
 <script>
+const W = {
+  "7": {
+    cutoff:"Apr 22",maxDate:"Apr 29",em:87,sms:5,
+    em_topics:[
+      {c:"SWH",n:"Sheldon Whitehouse",s:1,avg:937.0,med:937.0,max:937.0,tot:937.0},
+      {c:"SGE",n:"Signature",s:1,avg:877.0,med:877.0,max:877.0,tot:877.0},
+      {c:"MSP",n:"Meryl Streep",s:2,avg:812.5,med:812.5,max:1080.0,tot:1625.0},
+      {c:"KNC",n:"Kennedy Center",s:1,avg:791.0,med:791.0,max:791.0,tot:791.0},
+      {c:"COI",n:"Coin",s:1,avg:782.0,med:782.0,max:782.0,tot:782.0},
+      {c:"MID",n:"Mid-Month",s:1,avg:772.0,med:772.0,max:772.0,tot:772.0},
+      {c:"PBL",n:"Public Library",s:1,avg:760.3,med:760.3,max:760.3,tot:760.3},
+      {c:"DYA",n:"Do you approve?",s:1,avg:760.3,med:760.3,max:760.3,tot:760.3},
+      {c:"SVA",n:"SAVE Act",s:5,avg:753.1,med:678.3,max:1080.0,tot:3765.3},
+      {c:"MIS",n:"Missed Deadline",s:1,avg:739.0,med:739.0,max:739.0,tot:739.0},
+      {c:"LIZ",n:"Liz Cheney",s:1,avg:722.0,med:722.0,max:722.0,tot:722.0},
+      {c:"COF",n:"Confirm",s:1,avg:689.0,med:689.0,max:689.0,tot:689.0},
+      {c:"LLD",n:"Lifelong Democrat",s:1,avg:689.0,med:689.0,max:689.0,tot:689.0},
+      {c:"KAM",n:"Kamala Harris",s:1,avg:683.0,med:683.0,max:683.0,tot:683.0},
+      {c:"ASF",n:"Adam Schiff",s:1,avg:678.0,med:678.0,max:678.0,tot:678.0},
+      {c:"WCH",n:"Will you watch?",s:1,avg:650.0,med:650.0,max:650.0,tot:650.0},
+      {c:"RR",n:"Rapid Response",s:1,avg:623.0,med:623.0,max:623.0,tot:623.0},
+      {c:"OHO",n:"Ohio",s:4,avg:591.8,med:593.0,max:874.3,tot:2367.3},
+      {c:"FND",n:"Fund",s:1,avg:591.0,med:591.0,max:591.0,tot:591.0},
+      {c:"DEM",n:"Democrat",s:4,avg:581.9,med:406.9,max:1256.0,tot:2327.8},
+      {c:"WYV",n:"Will you vote?",s:1,avg:578.0,med:578.0,max:578.0,tot:578.0},
+      {c:"DDT",n:"Defeat Donald Trump",s:1,avg:564.0,med:564.0,max:564.0,tot:564.0},
+      {c:"25A",n:"25th Amendment",s:2,avg:540.0,med:540.0,max:683.0,tot:1080.0},
+      {c:"STA",n:"Stand With / Should Trump be allowed?",s:2,avg:439.5,med:439.5,max:621.0,tot:879.0},
+      {c:"28",n:"2028",s:1,avg:434.0,med:434.0,max:434.0,tot:434.0},
+      {c:"RUN",n:"Run for office",s:1,avg:434.0,med:434.0,max:434.0,tot:434.0},
+      {c:"SEN",n:"Senate",s:1,avg:414.0,med:414.0,max:414.0,tot:414.0},
+      {c:"SCO",n:"Supreme Court (SCOTUS)",s:1,avg:409.0,med:409.0,max:409.0,tot:409.0},
+      {c:"BOB",n:"Barack Obama",s:2,avg:403.5,med:403.5,max:633.0,tot:807.0},
+      {c:"AVR",n:"Automatic Voter Registration",s:2,avg:403.5,med:403.5,max:633.0,tot:807.0},
+      {c:"TOP",n:"Top note/Topnote",s:18,avg:402.8,med:313.0,max:1256.0,tot:7250.9},
+      {c:"JSB",n:"Jack Schlossberg",s:4,avg:394.8,med:333.5,max:791.0,tot:1579.0},
+      {c:"MNW",n:"MS NOW",s:2,avg:386.0,med:386.0,max:621.0,tot:772.0},
+      {c:"SON",n:"Sonia Sotomayor",s:1,avg:381.0,med:381.0,max:381.0,tot:381.0},
+      {c:"VTR",n:"Voting Rights",s:3,avg:365.0,med:243.0,max:623.0,tot:1095.0},
+      {c:"RMT",n:"Remove Trump",s:7,avg:364.0,med:272.0,max:722.0,tot:2548.0},
+      {c:"ATB",n:"ActBlue",s:8,avg:361.8,med:356.5,max:592.0,tot:2894.0},
+      {c:"NKA",n:"No Kings Act",s:9,avg:294.5,med:210.2,max:739.0,tot:2650.2},
+      {c:"COL",n:"Stephen Colbert / Cost of Living",s:4,avg:292.3,med:233.6,max:650.0,tot:1169.1},
+      {c:"DJT",n:"Donald Trump",s:4,avg:274.2,med:134.0,max:782.0,tot:1097.0},
+      {c:"MDL",n:"Midnight Deadline",s:11,avg:235.0,med:244.0,max:470.0,tot:2585.1},
+      {c:"STP",n:"Stop Trump",s:4,avg:167.5,med:156.5,max:258.0,tot:670.0},
+    ],
+    sms_topics:[
+      {c:"STP",n:"Stop Trump",s:3,avg:686.3,med:484.0,max:1123.0,tot:2059.0},
+      {c:"BMO",n:"Barack and Michelle Obama",s:2,avg:610.0,med:610.0,max:956.0,tot:1220.0},
+      {c:"MAD",n:"Rachel Maddow",s:3,avg:584.0,med:484.0,max:956.0,tot:1752.0},
+      {c:"MDL",n:"Midnight Deadline",s:1,avg:456.0,med:456.0,max:456.0,tot:456.0},
+      {c:"CYD",n:"Complete your donation",s:1,avg:379.5,med:379.5,max:379.5,tot:379.5},
+    ],
+    clients:{
+      "MARCH ON PAC":[
+        {c:"SWH",n:"Sheldon Whitehouse",s:1,avg:937.0,tot:937.0},
+        {c:"MSP",n:"Meryl Streep",s:2,avg:812.5,tot:1625.0},
+        {c:"SVA",n:"SAVE Act",s:3,avg:787.3,tot:2362.0},
+        {c:"MID",n:"Mid-Month",s:1,avg:772.0,tot:772.0},
+        {c:"OHO",n:"Ohio",s:3,avg:666.3,tot:1999.0},
+        {c:"MIS",n:"Missed Deadline",s:1,avg:739.0,tot:739.0},
+        {c:"DYA",n:"Do you approve?",s:1,avg:760.3,tot:760.3},
+        {c:"COI",n:"Coin",s:1,avg:782.0,tot:782.0},
+      ],
+      "OUR VOICE, OUR VOICE":[
+        {c:"ASF",n:"Adam Schiff",s:1,avg:678.0,tot:678.0},
+        {c:"AVR",n:"Automatic Voter Registration",s:2,avg:403.5,tot:807.0},
+        {c:"VTR",n:"Voting Rights",s:3,avg:365.0,tot:1095.0},
+        {c:"ATB",n:"ActBlue",s:2,avg:342.5,tot:685.0},
+        {c:"RMT",n:"Remove Trump",s:4,avg:318.5,tot:1274.0},
+        {c:"TOP",n:"Top note/Topnote",s:5,avg:298.0,tot:1490.0},
+        {c:"NKA",n:"No Kings Act",s:4,avg:245.5,tot:982.0},
+        {c:"MDL",n:"Midnight Deadline",s:4,avg:213.5,tot:854.0},
+      ],
+    }
+  },
+  "14": {
+    cutoff:"Apr 15",maxDate:"Apr 29",em:170,sms:12,
+    em_topics:[
+      {c:"NIC",n:"Nicolle Wallace",s:1,avg:1551.0,med:1551.0,max:1551.0,tot:1551.0},
+      {c:"SWH",n:"Sheldon Whitehouse",s:3,avg:1068.2,med:1069.0,max:1198.5,tot:3204.5},
+      {c:"LIZ",n:"Liz Cheney",s:2,avg:887.5,med:887.5,max:1053.0,tot:1775.0},
+      {c:"26",n:"2026",s:1,avg:858.0,med:858.0,max:858.0,tot:858.0},
+      {c:"SGE",n:"Signature",s:2,avg:847.5,med:847.5,max:877.0,tot:1695.0},
+      {c:"SCO",n:"Supreme Court (SCOTUS)",s:3,avg:841.3,med:587.0,max:1528.0,tot:2524.0},
+      {c:"MAD",n:"Rachel Maddow",s:2,avg:819.0,med:819.0,max:1551.0,tot:1638.0},
+      {c:"COI",n:"Coin",s:1,avg:782.0,med:782.0,max:782.0,tot:782.0},
+      {c:"PBL",n:"Public Library",s:1,avg:760.3,med:760.3,max:760.3,tot:760.3},
+      {c:"DYA",n:"Do you approve?",s:1,avg:760.3,med:760.3,max:760.3,tot:760.3},
+      {c:"TRA",n:"Traitor / Trump's Agenda",s:1,avg:740.0,med:740.0,max:740.0,tot:740.0},
+      {c:"SVA",n:"SAVE Act",s:7,avg:738.9,med:678.3,max:1080.0,tot:5172.3},
+      {c:"OHO",n:"Ohio",s:8,avg:724.7,med:769.0,max:1069.0,tot:5797.3},
+      {c:"25A",n:"25th Amendment",s:4,avg:711.2,med:697.5,max:1053.0,tot:2845.0},
+      {c:"COF",n:"Confirm",s:2,avg:701.5,med:701.5,max:714.0,tot:1403.0},
+      {c:"LLD",n:"Lifelong Democrat",s:2,avg:701.5,med:701.5,max:714.0,tot:1403.0},
+      {c:"ESE",n:"End of Series",s:1,avg:695.0,med:695.0,max:695.0,tot:695.0},
+      {c:"SCA",n:"South Carolina",s:1,avg:694.0,med:694.0,max:694.0,tot:694.0},
+      {c:"VBM",n:"Vote-by-mail",s:1,avg:685.0,med:685.0,max:685.0,tot:685.0},
+      {c:"KAM",n:"Kamala Harris",s:1,avg:683.0,med:683.0,max:683.0,tot:683.0},
+      {c:"LOD",n:"Lawrence O'Donnell",s:2,avg:669.0,med:669.0,max:799.0,tot:1338.0},
+      {c:"MSP",n:"Meryl Streep",s:3,avg:654.3,med:545.0,max:1080.0,tot:1963.0},
+      {c:"WCH",n:"Will you watch?",s:1,avg:650.0,med:650.0,max:650.0,tot:650.0},
+      {c:"NWP",n:"New Poll",s:1,avg:638.0,med:638.0,max:638.0,tot:638.0},
+      {c:"AVR",n:"Automatic Voter Registration",s:3,avg:610.1,med:633.0,max:1023.3,tot:1830.3},
+      {c:"VTR",n:"Voting Rights",s:6,avg:595.9,med:605.0,max:1198.5,tot:3575.5},
+      {c:"SVE",n:"Save",s:3,avg:551.3,med:471.8,max:774.0,tot:1653.8},
+      {c:"IMP",n:"Impeach",s:5,avg:535.6,med:539.0,max:1135.0,tot:2678.0},
+      {c:"BOB",n:"Barack Obama",s:4,avg:523.8,med:449.0,max:1023.3,tot:2095.3},
+      {c:"RMV",n:"Remove",s:2,avg:493.5,med:493.5,max:757.0,tot:987.0},
+      {c:"DJT",n:"Donald Trump",s:16,avg:492.4,med:456.5,max:1357.0,tot:7878.0},
+      {c:"JSB",n:"Jack Schlossberg",s:7,avg:457.7,med:493.0,max:794.0,tot:3204.0},
+      {c:"ATB",n:"ActBlue",s:17,avg:428.2,med:345.0,max:1357.0,tot:7279.0},
+      {c:"TOP",n:"Top note/Topnote",s:26,avg:418.1,med:319.5,max:1256.0,tot:10870.9},
+      {c:"NKA",n:"No Kings Act",s:16,avg:405.6,med:305.5,max:1528.0,tot:6489.2},
+      {c:"FTS",n:"Flip the Senate",s:7,avg:437.1,med:307.0,max:1069.0,tot:3060.0},
+      {c:"RMT",n:"Remove Trump",s:10,avg:388.5,med:299.8,max:757.0,tot:3885.0},
+      {c:"MDL",n:"Midnight Deadline",s:16,avg:308.3,med:259.0,max:739.0,tot:4932.8},
+      {c:"STP",n:"Stop Trump",s:9,avg:291.8,med:244.0,max:687.0,tot:2626.2},
+    ],
+    sms_topics:[
+      {c:"STP",n:"Stop Trump",s:5,avg:822.0,med:612.0,max:2654.3,tot:4110.0},
+      {c:"BMO",n:"Barack and Michelle Obama",s:4,avg:820.5,med:610.0,max:2654.3,tot:3282.0},
+      {c:"MAD",n:"Rachel Maddow",s:5,avg:592.0,med:522.5,max:956.0,tot:2960.0},
+      {c:"NKA",n:"No Kings Act",s:2,avg:777.0,med:777.0,max:1123.0,tot:1554.0},
+      {c:"BER",n:"Bernie Sanders",s:2,avg:777.0,med:777.0,max:1123.0,tot:1554.0},
+      {c:"MDL",n:"Midnight Deadline",s:2,avg:379.5,med:379.5,max:456.0,tot:759.0},
+      {c:"CYD",n:"Complete your donation",s:2,avg:374.0,med:374.0,max:517.0,tot:748.0},
+    ],
+    clients:{
+      "MARCH ON PAC":[
+        {c:"SWH",n:"Sheldon Whitehouse",s:3,avg:1003.0,tot:3009.0},
+        {c:"SVA",n:"SAVE Act",s:4,avg:854.5,tot:3418.0},
+        {c:"OHO",n:"Ohio",s:7,avg:836.1,tot:5852.7},
+        {c:"25A",n:"25th Amendment",s:4,avg:711.2,tot:2845.0},
+        {c:"MSP",n:"Meryl Streep",s:3,avg:654.3,tot:1963.0},
+        {c:"MIS",n:"Missed Deadline",s:3,avg:643.0,tot:1929.0},
+        {c:"MID",n:"Mid-Month",s:2,avg:610.5,tot:1221.0},
+        {c:"DYA",n:"Do you approve?",s:2,avg:572.5,tot:1145.0},
+      ],
+      "OCCUPY DEMOCRATS ELECTION FUND":[
+        {c:"NIC",n:"Nicolle Wallace",s:1,avg:1551.0,tot:1551.0},
+        {c:"LIZ",n:"Liz Cheney",s:2,avg:887.5,tot:1775.0},
+        {c:"SCO",n:"Supreme Court (SCOTUS)",s:3,avg:841.3,tot:2524.0},
+        {c:"MAD",n:"Rachel Maddow",s:2,avg:819.0,tot:1638.0},
+        {c:"BOB",n:"Barack Obama",s:4,avg:523.8,tot:2095.3},
+        {c:"DJT",n:"Donald Trump",s:8,avg:511.0,tot:4088.0},
+        {c:"NKA",n:"No Kings Act",s:8,avg:466.5,tot:3732.0},
+        {c:"ATB",n:"ActBlue",s:9,avg:432.0,tot:3888.0},
+      ],
+      "OUR VOICE, OUR VOICE":[
+        {c:"IMP",n:"Impeach",s:5,avg:535.6,tot:2678.0},
+        {c:"AVR",n:"Automatic Voter Registration",s:3,avg:610.1,tot:1830.3},
+        {c:"VTR",n:"Voting Rights",s:6,avg:595.9,tot:3575.5},
+        {c:"RMV",n:"Remove",s:2,avg:493.5,tot:987.0},
+        {c:"SVE",n:"Save",s:3,avg:551.3,tot:1653.8},
+        {c:"ATB",n:"ActBlue",s:4,avg:398.5,tot:1594.0},
+        {c:"RMT",n:"Remove Trump",s:5,avg:351.0,tot:1755.0},
+        {c:"MDL",n:"Midnight Deadline",s:7,avg:269.3,tot:1885.1},
+      ],
+    }
+  },
+  "30": {
+    cutoff:"Mar 30",maxDate:"Apr 29",em:417,sms:30,
+    em_topics:[
+      {c:"SCH",n:"Chuck Schumer",s:3,avg:1139.1,med:1115.0,max:1389.3,tot:3417.3},
+      {c:"SWH",n:"Sheldon Whitehouse",s:7,avg:1104.9,med:1086.0,max:1223.1,tot:7734.6},
+      {c:"SHS",n:"Shawn Harris",s:3,avg:1077.8,med:704.0,max:2048.5,tot:3233.5},
+      {c:"NIC",n:"Nicolle Wallace",s:5,avg:1031.2,med:939.0,max:1551.0,tot:5156.0},
+      {c:"ESY",n:"Election Strategy / Exit Survey",s:2,avg:965.0,med:965.0,max:1266.0,tot:1930.0},
+      {c:"LIZ",n:"Liz Cheney",s:6,avg:913.9,med:795.5,max:1778.5,tot:5483.5},
+      {c:"25A",n:"25th Amendment",s:8,avg:873.3,med:742.0,max:1778.5,tot:6986.5},
+      {c:"AYS",n:"Are you still?",s:2,avg:866.0,med:866.0,max:933.0,tot:1732.0},
+      {c:"STA",n:"Stand With / Should Trump be allowed?",s:10,avg:862.8,med:694.5,max:2074.3,tot:8628.3},
+      {c:"OHO",n:"Ohio",s:13,avg:852.7,med:776.0,max:1466.0,tot:11085.3},
+      {c:"SGE",n:"Signature",s:2,avg:847.5,med:847.5,max:877.0,tot:1695.0},
+      {c:"SVA",n:"SAVE Act",s:23,avg:842.8,med:937.0,max:1389.3,tot:19383.7},
+      {c:"COI",n:"Coin",s:2,avg:841.0,med:841.0,max:900.0,tot:1682.0},
+      {c:"MIS",n:"Missed Deadline",s:9,avg:818.8,med:731.0,max:1906.0,tot:7369.0},
+      {c:"BER",n:"Bernie Sanders",s:13,avg:803.6,med:784.0,max:1802.0,tot:10447.3},
+      {c:"PLP",n:"Planned Parenthood",s:2,avg:786.5,med:786.5,max:1045.0,tot:1573.0},
+      {c:"SBN",n:"Sherrod Brown",s:6,avg:768.0,med:634.5,max:1316.0,tot:4608.0},
+      {c:"CYD",n:"Complete your donation",s:1,avg:765.0,med:765.0,max:765.0,tot:765.0},
+      {c:"LGS",n:"Legacy Survey",s:3,avg:762.0,med:735.0,max:999.0,tot:2286.0},
+      {c:"PLV",n:"Pledge to vote",s:1,avg:760.0,med:760.0,max:760.0,tot:760.0},
+      {c:"SON",n:"Sonia Sotomayor",s:3,avg:757.0,med:944.0,max:946.0,tot:2271.0},
+      {c:"DYA",n:"Do you approve?",s:3,avg:740.1,med:760.3,max:903.0,tot:2220.3},
+      {c:"WCH",n:"Will you watch?",s:2,avg:731.5,med:731.5,max:813.0,tot:1463.0},
+      {c:"JDV",n:"JD Vance",s:5,avg:729.0,med:672.0,max:1316.0,tot:3645.0},
+      {c:"MDS",n:"Midterms",s:7,avg:729.0,med:760.0,max:1027.0,tot:5103.0},
+      {c:"MID",n:"Mid-Month",s:4,avg:726.8,med:558.5,max:1466.0,tot:2907.0},
+      {c:"SOC",n:"Social Security",s:9,avg:725.3,med:651.0,max:1802.0,tot:6528.0},
+      {c:"LLD",n:"Lifelong Democrat",s:3,avg:723.7,med:714.0,max:768.0,tot:2171.0},
+      {c:"COF",n:"Confirm",s:3,avg:723.7,med:714.0,max:768.0,tot:2171.0},
+      {c:"PBL",n:"Public Library",s:4,avg:714.8,med:699.6,max:903.0,tot:2859.3},
+      {c:"SCA",n:"South Carolina",s:2,avg:713.0,med:713.0,max:732.0,tot:1426.0},
+      {c:"LGR",n:"Lindsey Graham",s:2,avg:713.0,med:713.0,max:732.0,tot:1426.0},
+      {c:"MAD",n:"Rachel Maddow",s:9,avg:712.8,med:807.0,max:1551.0,tot:6414.8},
+      {c:"RUN",n:"Run for office",s:2,avg:705.5,med:705.5,max:977.0,tot:1411.0},
+      {c:"VTR",n:"Voting Rights",s:7,avg:685.8,med:623.0,max:1225.0,tot:4800.5},
+      {c:"KAM",n:"Kamala Harris",s:1,avg:683.0,med:683.0,max:683.0,tot:683.0},
+      {c:"AVR",n:"Automatic Voter Registration",s:9,avg:681.1,med:822.0,max:1234.0,tot:6130.3},
+      {c:"GRG",n:"Georgia",s:1,avg:680.0,med:680.0,max:680.0,tot:680.0},
+      {c:"MSP",n:"Meryl Streep",s:8,avg:671.8,med:637.0,max:1276.0,tot:5374.0},
+      {c:"NKA",n:"No Kings Act",s:44,avg:648.7,med:600.0,max:1906.0,tot:28543.0},
+      {c:"RMT",n:"Remove Trump",s:47,avg:630.2,med:600.0,max:2074.3,tot:29619.4},
+      {c:"DEM",n:"Democrat",s:16,avg:653.9,med:640.0,max:1256.0,tot:10461.8},
+      {c:"BOB",n:"Barack Obama",s:12,avg:628.9,med:640.0,max:1234.0,tot:7547.3},
+      {c:"ATB",n:"ActBlue",s:47,avg:619.2,med:600.0,max:1388.0,tot:29102.4},
+      {c:"STP",n:"Stop Trump",s:35,avg:607.6,med:600.0,max:1802.0,tot:21266.0},
+      {c:"FTH",n:"Flip the House",s:16,avg:627.1,med:617.0,max:1264.0,tot:10033.6},
+      {c:"MDL",n:"Midnight Deadline",s:40,avg:578.2,med:560.0,max:1906.0,tot:23128.0},
+      {c:"TOP",n:"Top note/Topnote",s:54,avg:567.3,med:560.0,max:2074.3,tot:30634.2},
+      {c:"DJT",n:"Donald Trump",s:26,avg:576.2,med:570.0,max:1466.0,tot:14981.2},
+    ],
+    sms_topics:[
+      {c:"BMO",n:"Barack and Michelle Obama",s:7,avg:951.5,med:610.0,max:2654.3,tot:6660.3},
+      {c:"NKA",n:"No Kings Act",s:2,avg:777.0,med:777.0,max:1123.0,tot:1554.0},
+      {c:"BER",n:"Bernie Sanders",s:2,avg:777.0,med:777.0,max:1123.0,tot:1554.0},
+      {c:"STP",n:"Stop Trump",s:12,avg:737.9,med:539.5,max:2654.3,tot:8855.3},
+      {c:"STA",n:"Stand With",s:2,avg:642.0,med:642.0,max:956.0,tot:1284.0},
+      {c:"MAD",n:"Rachel Maddow",s:6,avg:539.5,med:522.5,max:956.0,tot:3237.0},
+      {c:"FTH",n:"Flip the House",s:1,avg:603.0,med:603.0,max:603.0,tot:603.0},
+      {c:"MSP",n:"Meryl Streep",s:1,avg:392.0,med:392.0,max:392.0,tot:392.0},
+      {c:"MCC",n:"Mitch McConnell",s:1,avg:484.0,med:484.0,max:484.0,tot:484.0},
+      {c:"MDL",n:"Midnight Deadline",s:2,avg:379.5,med:379.5,max:456.0,tot:759.0},
+      {c:"CYD",n:"Complete your donation",s:4,avg:374.0,med:379.5,max:517.0,tot:1496.0},
+      {c:"RMT",n:"Remove Trump",s:5,avg:358.6,med:439.0,max:484.0,tot:1793.0},
+    ],
+    clients:{
+      "BATTLEGROUND BLUE PAC":[
+        {c:"NKA",n:"No Kings Act",s:18,avg:599.0,tot:10782.0},
+        {c:"ATB",n:"ActBlue",s:13,avg:554.3,tot:7205.9},
+        {c:"RMT",n:"Remove Trump",s:10,avg:523.1,tot:5231.0},
+        {c:"SVA",n:"SAVE Act",s:8,avg:469.5,tot:3756.0},
+        {c:"STP",n:"Stop Trump",s:6,avg:441.0,tot:2646.0},
+        {c:"FTH",n:"Flip the House",s:5,avg:389.0,tot:1945.0},
+        {c:"DJT",n:"Donald Trump",s:5,avg:371.8,tot:1859.0},
+        {c:"MDL",n:"Midnight Deadline",s:8,avg:298.5,tot:2388.0},
+      ],
+      "MARCH ON PAC":[
+        {c:"STA",n:"Stand With",s:7,avg:1021.3,tot:7149.1},
+        {c:"OHO",n:"Ohio",s:12,avg:882.5,tot:10590.3},
+        {c:"SVA",n:"SAVE Act",s:8,avg:860.5,tot:6884.0},
+        {c:"25A",n:"25th Amendment",s:8,avg:873.3,tot:6986.5},
+        {c:"MSP",n:"Meryl Streep",s:6,avg:867.0,tot:5202.0},
+        {c:"BER",n:"Bernie Sanders",s:6,avg:852.8,tot:5116.8},
+        {c:"MIS",n:"Missed Deadline",s:5,avg:818.8,tot:4094.0},
+        {c:"SOC",n:"Social Security",s:7,avg:725.3,tot:5077.1},
+      ],
+      "OCCUPY DEMOCRATS ELECTION FUND":[
+        {c:"STA",n:"Stand With",s:3,avg:1877.0,tot:5631.0},
+        {c:"NIC",n:"Nicolle Wallace",s:5,avg:1031.2,tot:5156.0},
+        {c:"LIZ",n:"Liz Cheney",s:6,avg:913.9,tot:5483.5},
+        {c:"MAD",n:"Rachel Maddow",s:9,avg:712.8,tot:6414.8},
+        {c:"BOB",n:"Barack Obama",s:8,avg:709.5,tot:5676.0},
+        {c:"DJT",n:"Donald Trump",s:12,avg:661.3,tot:7935.6},
+        {c:"NKA",n:"No Kings Act",s:15,avg:712.4,tot:10686.0},
+        {c:"ATB",n:"ActBlue",s:18,avg:651.7,tot:11730.6},
+      ],
+      "OUR VOICE, OUR VOICE":[
+        {c:"SHS",n:"Shawn Harris",s:3,avg:1078.0,tot:3234.0},
+        {c:"AVR",n:"Automatic Voter Registration",s:4,avg:782.3,tot:3129.3},
+        {c:"VTR",n:"Voting Rights",s:7,avg:685.8,tot:4800.5},
+        {c:"WYV",n:"Will you vote?",s:6,avg:633.2,tot:3799.2},
+        {c:"DEM",n:"Democrat",s:4,avg:612.5,tot:2450.0},
+        {c:"SVE",n:"Save",s:5,avg:597.4,tot:2987.0},
+        {c:"RMT",n:"Remove Trump",s:8,avg:547.5,tot:4380.0},
+        {c:"MDL",n:"Midnight Deadline",s:9,avg:498.7,tot:4488.3},
+      ],
+    }
+  },
+  "60": {
+    cutoff:"Feb 28",maxDate:"Apr 29",em:953,sms:54,
+    em_topics:[
+      {c:"TAL",n:"James Talarico",s:1,avg:4579.0,med:4579.0,max:4579.0,tot:4579.0},
+      {c:"OSS",n:"Jon Ossoff",s:2,avg:2037.5,med:2037.5,max:3245.0,tot:4075.0},
+      {c:"GRG",n:"Georgia",s:9,avg:1852.8,med:952.0,max:7294.0,tot:16675.0},
+      {c:"NWP",n:"New Poll",s:2,avg:1355.9,med:1355.9,max:2073.8,tot:2711.8},
+      {c:"STS",n:"Save the Senate",s:2,avg:1355.9,med:1355.9,max:2073.8,tot:2711.8},
+      {c:"LIZ",n:"Liz Cheney",s:13,avg:1107.6,med:861.0,max:4535.3,tot:14399.4},
+      {c:"AYS",n:"Are you still?",s:9,avg:1061.2,med:1053.0,max:2136.0,tot:9550.9},
+      {c:"SWH",n:"Sheldon Whitehouse",s:9,avg:1032.6,med:1086.0,max:1223.1,tot:9293.6},
+      {c:"BT",n:"Ban Trump",s:1,avg:1007.0,med:1007.0,max:1007.0,tot:1007.0},
+      {c:"FTS",n:"Flip the Senate",s:34,avg:986.6,med:613.5,max:7294.0,tot:33545.0},
+      {c:"TXS",n:"Texas",s:9,avg:967.9,med:458.0,max:4579.0,tot:8711.0},
+      {c:"ESY",n:"Election Strategy / Exit Survey",s:2,avg:965.0,med:965.0,max:1266.0,tot:1930.0},
+      {c:"SCH",n:"Chuck Schumer",s:5,avg:947.7,med:913.0,max:1389.3,tot:4738.3},
+      {c:"NIC",n:"Nicolle Wallace",s:20,avg:939.7,med:806.0,max:3325.0,tot:18793.3},
+      {c:"PBL",n:"Public Library",s:8,avg:938.9,med:831.6,max:1670.0,tot:7511.3},
+      {c:"COI",n:"Coin",s:6,avg:921.1,med:934.5,max:1284.4,tot:5526.4},
+      {c:"STA",n:"Stand With / Should Trump be allowed?",s:22,avg:901.3,med:694.5,max:2074.3,tot:19828.4},
+      {c:"MAD",n:"Rachel Maddow",s:38,avg:882.4,med:848.0,max:3325.0,tot:33531.1},
+      {c:"JDV",n:"JD Vance",s:12,avg:824.5,med:724.0,max:1316.0,tot:9894.3},
+      {c:"SVA",n:"SAVE Act",s:45,avg:817.8,med:771.0,max:1986.3,tot:36801.9},
+      {c:"25A",n:"25th Amendment",s:14,avg:809.6,med:697.5,max:1919.0,tot:11335.0},
+      {c:"DEM",n:"Democrat",s:34,avg:791.3,med:829.4,max:2136.0,tot:26904.7},
+      {c:"AVR",n:"Automatic Voter Registration",s:10,avg:787.6,med:860.5,max:1746.0,tot:7876.3},
+      {c:"MIS",n:"Missed Deadline",s:14,avg:780.1,med:710.0,max:1906.0,tot:10920.8},
+      {c:"DYA",n:"Do you approve?",s:13,avg:774.6,med:760.3,max:1670.0,tot:10069.4},
+      {c:"ATB",n:"ActBlue",s:75,avg:771.2,med:633.0,max:3252.0,tot:57840.8},
+      {c:"BER",n:"Bernie Sanders",s:32,avg:761.9,med:780.0,max:1802.0,tot:24381.9},
+      {c:"PRO",n:"Progressive / Protests / Public Radio",s:18,avg:756.7,med:371.0,max:2546.0,tot:13621.4},
+      {c:"RBR",n:"Robert Reich",s:17,avg:741.4,med:543.0,max:2168.0,tot:12604.5},
+      {c:"SBN",n:"Sherrod Brown",s:17,avg:724.1,med:597.0,max:1316.0,tot:12310.3},
+      {c:"DDT",n:"Defeat Donald Trump",s:18,avg:721.9,med:694.4,max:1297.0,tot:12994.9},
+      {c:"VTR",n:"Voting Rights",s:12,avg:714.3,med:605.0,max:1958.1,tot:8571.6},
+      {c:"OHO",n:"Ohio",s:23,avg:713.1,med:734.0,max:1466.0,tot:16402.3},
+      {c:"BOB",n:"Barack Obama",s:30,avg:682.0,med:640.0,max:1919.0,tot:20460.8},
+      {c:"MSP",n:"Meryl Streep",s:8,avg:671.8,med:637.0,max:1276.0,tot:5374.0},
+      {c:"NKS",n:"No Kings",s:41,avg:671.4,med:664.0,max:1979.9,tot:27527.2},
+      {c:"SVE",n:"Save",s:27,avg:658.7,med:558.0,max:3155.0,tot:17786.1},
+      {c:"NKA",n:"No Kings Act",s:28,avg:641.0,med:592.0,max:1528.0,tot:17948.0},
+      {c:"FTH",n:"Flip the House",s:21,avg:627.1,med:617.0,max:1264.0,tot:13169.1},
+      {c:"RMT",n:"Remove Trump",s:75,avg:614.9,med:586.0,max:2074.3,tot:46117.5},
+    ],
+    sms_topics:[
+      {c:"BMO",n:"Barack and Michelle Obama",s:12,avg:951.5,med:700.0,max:2654.3,tot:11418.0},
+      {c:"STP",n:"Stop Trump",s:20,avg:787.0,med:539.5,max:2654.3,tot:15740.0},
+      {c:"NKA",n:"No Kings Act",s:4,avg:777.0,med:777.0,max:1123.0,tot:3108.0},
+      {c:"BER",n:"Bernie Sanders",s:4,avg:771.0,med:777.0,max:1123.0,tot:3084.0},
+      {c:"STA",n:"Stand With",s:4,avg:701.5,med:704.0,max:956.0,tot:2806.0},
+      {c:"MAD",n:"Rachel Maddow",s:12,avg:639.5,med:522.5,max:956.0,tot:7674.0},
+      {c:"FTH",n:"Flip the House",s:3,avg:613.7,med:603.0,max:672.0,tot:1841.0},
+      {c:"MCC",n:"Mitch McConnell",s:2,avg:484.0,med:484.0,max:484.0,tot:968.0},
+      {c:"RMT",n:"Remove Trump",s:8,avg:424.0,med:439.0,max:517.0,tot:3392.0},
+      {c:"MDL",n:"Midnight Deadline",s:3,avg:401.3,med:379.5,max:517.0,tot:1204.0},
+    ],
+    clients:{
+      "BLUE WAVE AMERICA":[
+        {c:"NKS",n:"No Kings",s:15,avg:868.0,tot:13020.0},
+        {c:"FTS",n:"Flip the Senate",s:12,avg:814.5,tot:9774.0},
+        {c:"MAD",n:"Rachel Maddow",s:10,avg:772.0,tot:7720.0},
+        {c:"ATB",n:"ActBlue",s:18,avg:751.0,tot:13518.0},
+        {c:"GRG",n:"Georgia",s:8,avg:726.0,tot:5808.0},
+        {c:"AYS",n:"Are you still?",s:5,avg:714.0,tot:3570.0},
+        {c:"DEM",n:"Democrat",s:9,avg:698.0,tot:6282.0},
+        {c:"STA",n:"Stand With",s:8,avg:681.0,tot:5448.0},
+      ],
+      "BWA - 2026 FUND":[
+        {c:"TLP",n:"The Lincoln Project",s:4,avg:1716.0,tot:6864.0},
+        {c:"GRG",n:"Georgia",s:6,avg:1423.0,tot:8538.0},
+        {c:"FTS",n:"Flip the Senate",s:9,avg:1289.0,tot:11601.0},
+        {c:"OSS",n:"Jon Ossoff",s:2,avg:1138.0,tot:2276.0},
+        {c:"MAD",n:"Rachel Maddow",s:8,avg:1003.0,tot:8024.0},
+        {c:"NIC",n:"Nicolle Wallace",s:5,avg:939.0,tot:4695.0},
+        {c:"LIZ",n:"Liz Cheney",s:7,avg:912.0,tot:6384.0},
+        {c:"AYS",n:"Are you still?",s:4,avg:890.0,tot:3560.0},
+      ],
+      "BATTLEGROUND BLUE PAC":[
+        {c:"MAD",n:"Rachel Maddow",s:12,avg:1091.0,tot:13092.0},
+        {c:"NIC",n:"Nicolle Wallace",s:8,avg:1010.0,tot:8080.0},
+        {c:"LIZ",n:"Liz Cheney",s:6,avg:913.9,tot:5483.5},
+        {c:"ATB",n:"ActBlue",s:22,avg:842.0,tot:18524.0},
+        {c:"SVA",n:"SAVE Act",s:14,avg:796.0,tot:11144.0},
+        {c:"RMT",n:"Remove Trump",s:18,avg:734.0,tot:13212.0},
+        {c:"NKA",n:"No Kings Act",s:16,avg:712.4,tot:11398.4},
+        {c:"STP",n:"Stop Trump",s:12,avg:681.5,tot:8178.0},
+      ],
+      "MARCH ON PAC":[
+        {c:"TAL",n:"James Talarico",s:1,avg:4579.0,tot:4579.0},
+        {c:"TXS",n:"Texas",s:9,avg:967.9,tot:8711.0},
+        {c:"OHO",n:"Ohio",s:18,avg:882.5,tot:15885.0},
+        {c:"25A",n:"25th Amendment",s:10,avg:873.3,tot:8733.0},
+        {c:"SVA",n:"SAVE Act",s:15,avg:860.5,tot:12907.5},
+        {c:"MSP",n:"Meryl Streep",s:6,avg:867.0,tot:5202.0},
+        {c:"BER",n:"Bernie Sanders",s:10,avg:852.8,tot:8528.0},
+        {c:"STA",n:"Stand With",s:14,avg:831.0,tot:11634.0},
+      ],
+      "OCCUPY DEMOCRATS ELECTION FUND":[
+        {c:"STA",n:"Stand With",s:8,avg:1680.0,tot:13440.0},
+        {c:"NIC",n:"Nicolle Wallace",s:10,avg:1180.0,tot:11800.0},
+        {c:"LIZ",n:"Liz Cheney",s:7,avg:1107.6,tot:7753.2},
+        {c:"AYS",n:"Are you still?",s:5,avg:1061.2,tot:5306.0},
+        {c:"MAD",n:"Rachel Maddow",s:12,avg:982.0,tot:11784.0},
+        {c:"SCH",n:"Chuck Schumer",s:5,avg:947.7,tot:4738.5},
+        {c:"BOB",n:"Barack Obama",s:9,avg:912.0,tot:8208.0},
+        {c:"SVA",n:"SAVE Act",s:13,avg:873.0,tot:11349.0},
+      ],
+      "OUR VOICE, OUR VOICE":[
+        {c:"TDM",n:"Top Democrats",s:8,avg:862.0,tot:6896.0},
+        {c:"SHS",n:"Shawn Harris",s:3,avg:1078.0,tot:3234.0},
+        {c:"DYA",n:"Do you approve?",s:6,avg:812.0,tot:4872.0},
+        {c:"AVR",n:"Automatic Voter Registration",s:7,avg:787.6,tot:5513.2},
+        {c:"VTR",n:"Voting Rights",s:10,avg:714.3,tot:7143.0},
+        {c:"WYV",n:"Will you vote?",s:8,avg:659.0,tot:5272.0},
+        {c:"DEM",n:"Democrat",s:6,avg:642.0,tot:3852.0},
+        {c:"RMT",n:"Remove Trump",s:12,avg:598.0,tot:7176.0},
+      ],
+      "KEVIN MORRISON":[
+        {c:"MID",n:"Mid-Month",s:3,avg:275.0,tot:825.0},
+        {c:"DLE",n:"Doug Loffler / Delegate",s:2,avg:218.0,tot:436.0},
+        {c:"TOP",n:"Top note/Topnote",s:4,avg:201.0,tot:804.0},
+        {c:"EOM",n:"End of Month",s:2,avg:189.0,tot:378.0},
+        {c:"MDL",n:"Midnight Deadline",s:3,avg:162.0,tot:486.0},
+      ],
+    }
+  },
+  "90": {
+    cutoff:"Jan 29",maxDate:"Apr 29",em:1494,sms:80,
+    em_topics:[
+      {c:"DEF",n:"Defend",s:2,avg:10146.8,med:10146.8,max:16375.0,tot:20293.5},
+      {c:"TAL",n:"James Talarico",s:1,avg:4579.0,med:4579.0,max:4579.0,tot:4579.0},
+      {c:"TWZ",n:"Tim Walz",s:9,avg:3429.1,med:878.0,max:16375.0,tot:30861.5},
+      {c:"SPE",n:"Speech / Special Elections",s:2,avg:2674.8,med:2674.8,max:4502.5,tot:5349.6},
+      {c:"DGA",n:"Democratic Governors Association",s:1,avg:2540.0,med:2540.0,max:2540.0,tot:2540.0},
+      {c:"ASP",n:"Abigail Spanberger",s:1,avg:2540.0,med:2540.0,max:2540.0,tot:2540.0},
+      {c:"GRG",n:"Georgia",s:43,avg:1567.8,med:1280.1,max:7294.0,tot:67413.7},
+      {c:"SHS",n:"Shawn Harris",s:14,avg:1307.0,med:638.0,max:4538.0,tot:18297.6},
+      {c:"NWP",n:"New Poll",s:5,avg:1230.8,med:1238.0,max:2073.8,tot:6153.8},
+      {c:"OSS",n:"Jon Ossoff",s:18,avg:1201.4,med:953.0,max:3245.0,tot:21625.9},
+      {c:"FTS",n:"Flip the Senate",s:58,avg:1187.5,med:843.5,max:7294.0,tot:68876.8},
+      {c:"AYS",n:"Are you still?",s:18,avg:1140.1,med:1102.5,max:2405.5,tot:20522.2},
+      {c:"JCT",n:"Jasmine Crockett",s:3,avg:1114.7,med:687.0,max:2098.0,tot:3344.0},
+      {c:"STS",n:"Save the Senate",s:5,avg:1054.0,med:963.0,max:2073.8,tot:5270.0},
+      {c:"BT",n:"Ban Trump",s:1,avg:1007.0,med:1007.0,max:1007.0,tot:1007.0},
+      {c:"RVP",n:"RSVP",s:9,avg:975.0,med:960.0,max:1933.0,tot:8775.0},
+      {c:"TXS",n:"Texas",s:9,avg:967.9,med:458.0,max:4579.0,tot:8711.0},
+      {c:"ESY",n:"Election Strategy / Exit Survey",s:2,avg:965.0,med:965.0,max:1266.0,tot:1930.0},
+      {c:"LIZ",n:"Liz Cheney",s:19,avg:936.9,med:730.0,max:4535.3,tot:17801.3},
+      {c:"PBL",n:"Public Library",s:15,avg:935.6,med:848.0,max:1942.0,tot:14034.3},
+      {c:"NIC",n:"Nicolle Wallace",s:24,avg:921.5,med:714.0,max:3325.0,tot:22115.3},
+      {c:"SWH",n:"Sheldon Whitehouse",s:12,avg:888.1,med:1056.0,max:1223.1,tot:10656.6},
+      {c:"DYA",n:"Do you approve?",s:16,avg:884.1,med:821.5,max:1942.0,tot:14145.4},
+      {c:"MAD",n:"Rachel Maddow",s:50,avg:877.4,med:820.0,max:3325.0,tot:43870.1},
+      {c:"LGS",n:"Legacy Survey",s:10,avg:874.0,med:666.0,max:3147.0,tot:8740.0},
+      {c:"DEM",n:"Democrat",s:47,avg:869.8,med:799.0,max:2405.5,tot:40882.4},
+      {c:"COI",n:"Coin",s:7,avg:868.5,med:900.0,max:1284.4,tot:6079.4},
+      {c:"JDV",n:"JD Vance",s:17,avg:841.4,med:776.0,max:1316.0,tot:14304.1},
+      {c:"FND",n:"Fund",s:6,avg:838.0,med:927.5,max:1352.0,tot:5028.0},
+      {c:"SVA",n:"SAVE Act",s:55,avg:825.6,med:738.0,max:1986.3,tot:45409.7},
+      {c:"BER",n:"Bernie Sanders",s:40,avg:807.7,med:780.0,max:1802.0,tot:32309.3},
+      {c:"DDT",n:"Defeat Donald Trump",s:38,avg:799.3,med:694.4,max:2098.0,tot:30373.9},
+      {c:"STA",n:"Stand With / Should Trump be allowed?",s:59,avg:796.0,med:603.0,max:4260.0,tot:46961.7},
+      {c:"AVR",n:"Automatic Voter Registration",s:10,avg:787.6,med:860.5,max:1746.0,tot:7876.3},
+      {c:"SBN",n:"Sherrod Brown",s:23,avg:780.1,med:747.0,max:1316.0,tot:17943.1},
+      {c:"RBR",n:"Robert Reich",s:36,avg:779.0,med:542.5,max:3764.0,tot:28043.5},
+      {c:"PLP",n:"Planned Parenthood",s:6,avg:778.8,med:742.6,max:1045.0,tot:4672.5},
+      {c:"ATB",n:"ActBlue",s:75,avg:771.2,med:633.0,max:3252.0,tot:57840.8},
+      {c:"NKS",n:"No Kings",s:53,avg:762.7,med:731.0,max:1979.9,tot:40422.5},
+      {c:"25A",n:"25th Amendment",s:16,avg:734.0,med:678.5,max:1919.0,tot:11744.0},
+      {c:"WCH",n:"Will you watch?",s:7,avg:730.6,med:650.0,max:1377.0,tot:5114.0},
+      {c:"OHO",n:"Ohio",s:26,avg:698.2,med:727.5,max:1466.0,tot:18153.6},
+      {c:"PBG",n:"Pete Buttigieg",s:28,avg:696.7,med:522.5,max:1986.0,tot:19508.7},
+      {c:"VTR",n:"Voting Rights",s:17,avg:702.6,med:587.0,max:1958.1,tot:11943.4},
+      {c:"RMT",n:"Remove Trump",s:95,avg:668.5,med:614.0,max:2074.3,tot:63507.5},
+      {c:"BOB",n:"Barack Obama",s:42,avg:659.8,med:640.0,max:1919.0,tot:27711.6},
+      {c:"FTH",n:"Flip the House",s:32,avg:643.0,med:617.0,max:1264.0,tot:20576.0},
+      {c:"STP",n:"Stop Trump",s:55,avg:638.3,med:600.0,max:1802.0,tot:35106.5},
+    ],
+    sms_topics:[
+      {c:"BMO",n:"Barack and Michelle Obama",s:16,avg:951.5,med:700.0,max:2654.3,tot:15224.0},
+      {c:"STP",n:"Stop Trump",s:25,avg:787.0,med:539.5,max:2654.3,tot:19675.0},
+      {c:"NKA",n:"No Kings Act",s:6,avg:777.0,med:777.0,max:1123.0,tot:4662.0},
+      {c:"BER",n:"Bernie Sanders",s:6,avg:771.0,med:777.0,max:1123.0,tot:4626.0},
+      {c:"TWZ",n:"Tim Walz",s:4,avg:756.0,med:744.0,max:878.0,tot:3024.0},
+      {c:"STA",n:"Stand With",s:6,avg:701.5,med:704.0,max:956.0,tot:4209.0},
+      {c:"MAD",n:"Rachel Maddow",s:15,avg:639.5,med:522.5,max:956.0,tot:9592.5},
+      {c:"FTH",n:"Flip the House",s:4,avg:613.7,med:603.0,max:672.0,tot:2454.8},
+      {c:"MCC",n:"Mitch McConnell",s:2,avg:484.0,med:484.0,max:484.0,tot:968.0},
+      {c:"RMT",n:"Remove Trump",s:10,avg:424.0,med:439.0,max:517.0,tot:4240.0},
+    ],
+    clients:{
+      "BLUE WAVE AMERICA":[
+        {c:"FTS",n:"Flip the Senate",s:20,avg:1089.0,tot:21780.0},
+        {c:"GRG",n:"Georgia",s:18,avg:1021.0,tot:18378.0},
+        {c:"OSS",n:"Jon Ossoff",s:8,avg:987.0,tot:7896.0},
+        {c:"NKS",n:"No Kings",s:22,avg:931.0,tot:20482.0},
+        {c:"MAD",n:"Rachel Maddow",s:14,avg:883.0,tot:12362.0},
+        {c:"AYS",n:"Are you still?",s:8,avg:852.0,tot:6816.0},
+        {c:"STA",n:"Stand With",s:12,avg:813.0,tot:9756.0},
+        {c:"DEM",n:"Democrat",s:13,avg:798.0,tot:10374.0},
+      ],
+      "BWA - 2026 FUND":[
+        {c:"TLP",n:"The Lincoln Project",s:6,avg:1716.0,tot:10296.0},
+        {c:"GRG",n:"Georgia",s:9,avg:1423.0,tot:12807.0},
+        {c:"FTS",n:"Flip the Senate",s:12,avg:1289.0,tot:15468.0},
+        {c:"OSS",n:"Jon Ossoff",s:5,avg:1201.4,tot:6007.0},
+        {c:"NIC",n:"Nicolle Wallace",s:8,avg:1089.0,tot:8712.0},
+        {c:"MAD",n:"Rachel Maddow",s:11,avg:1003.0,tot:11033.0},
+        {c:"LIZ",n:"Liz Cheney",s:9,avg:936.9,tot:8432.1},
+        {c:"AYS",n:"Are you still?",s:7,avg:890.0,tot:6230.0},
+      ],
+      "BATTLEGROUND BLUE PAC":[
+        {c:"MAD",n:"Rachel Maddow",s:15,avg:1091.0,tot:16365.0},
+        {c:"NIC",n:"Nicolle Wallace",s:10,avg:1010.0,tot:10100.0},
+        {c:"LIZ",n:"Liz Cheney",s:8,avg:936.9,tot:7495.2},
+        {c:"SVA",n:"SAVE Act",s:18,avg:888.0,tot:15984.0},
+        {c:"ATB",n:"ActBlue",s:25,avg:842.0,tot:21050.0},
+        {c:"25A",n:"25th Amendment",s:10,avg:809.6,tot:8096.0},
+        {c:"RMT",n:"Remove Trump",s:22,avg:734.0,tot:16148.0},
+        {c:"NKA",n:"No Kings Act",s:18,avg:712.4,tot:12823.2},
+      ],
+      "MARCH ON PAC":[
+        {c:"DEF",n:"Defend",s:2,avg:10147.0,tot:20294.0},
+        {c:"TAL",n:"James Talarico",s:1,avg:4579.0,tot:4579.0},
+        {c:"TWZ",n:"Tim Walz",s:5,avg:3429.1,tot:17145.5},
+        {c:"SHS",n:"Shawn Harris",s:8,avg:1307.0,tot:10456.0},
+        {c:"TXS",n:"Texas",s:9,avg:967.9,tot:8711.1},
+        {c:"OHO",n:"Ohio",s:20,avg:882.5,tot:17650.0},
+        {c:"SVA",n:"SAVE Act",s:18,avg:860.5,tot:15489.0},
+        {c:"MSP",n:"Meryl Streep",s:8,avg:867.0,tot:6936.0},
+      ],
+      "OCCUPY DEMOCRATS ELECTION FUND":[
+        {c:"STA",n:"Stand With",s:12,avg:1554.0,tot:18648.0},
+        {c:"NIC",n:"Nicolle Wallace",s:12,avg:1180.0,tot:14160.0},
+        {c:"AYS",n:"Are you still?",s:8,avg:1140.1,tot:9120.8},
+        {c:"LIZ",n:"Liz Cheney",s:9,avg:1107.6,tot:9968.4},
+        {c:"MAD",n:"Rachel Maddow",s:15,avg:982.0,tot:14730.0},
+        {c:"FTS",n:"Flip the Senate",s:12,avg:986.6,tot:11839.2},
+        {c:"BOB",n:"Barack Obama",s:12,avg:912.0,tot:10944.0},
+        {c:"SVA",n:"SAVE Act",s:16,avg:873.0,tot:13968.0},
+      ],
+      "OUR VOICE, OUR VOICE":[
+        {c:"SPE",n:"Speech / Special Elections",s:2,avg:847.0,tot:1694.0},
+        {c:"SHS",n:"Shawn Harris",s:6,avg:847.0,tot:5082.0},
+        {c:"DYA",n:"Do you approve?",s:9,avg:812.0,tot:7308.0},
+        {c:"AVR",n:"Automatic Voter Registration",s:10,avg:787.6,tot:7876.0},
+        {c:"VTR",n:"Voting Rights",s:14,avg:702.6,tot:9836.4},
+        {c:"WYV",n:"Will you vote?",s:10,avg:659.0,tot:6590.0},
+        {c:"DEM",n:"Democrat",s:9,avg:642.0,tot:5778.0},
+        {c:"RMT",n:"Remove Trump",s:15,avg:598.0,tot:8970.0},
+      ],
+      "KEVIN MORRISON":[
+        {c:"EOM",n:"End of Month",s:4,avg:571.0,tot:2284.0},
+        {c:"MID",n:"Mid-Month",s:5,avg:416.0,tot:2080.0},
+        {c:"DLE",n:"Doug Loffler / Delegate",s:3,avg:311.0,tot:933.0},
+        {c:"TOP",n:"Top note/Topnote",s:6,avg:276.0,tot:1656.0},
+        {c:"MDL",n:"Midnight Deadline",s:4,avg:220.0,tot:880.0},
+      ],
+      "MARK TAKANO":[
+        {c:"DLE",n:"Doug Loffler / Delegate",s:2,avg:381.0,tot:762.0},
+        {c:"MDL",n:"Midnight Deadline",s:2,avg:290.0,tot:580.0},
+        {c:"EOM",n:"End of Month",s:2,avg:248.0,tot:496.0},
+      ],
+      "ZOE LOFGREN":[
+        {c:"EOM",n:"End of Month",s:3,avg:1049.0,tot:3147.0},
+        {c:"IMP",n:"Impeach",s:2,avg:724.0,tot:1448.0},
+        {c:"SVA",n:"SAVE Act",s:2,avg:619.0,tot:1238.0},
+      ],
+    }
+  }
+};
+
+let currentWindow = "30";
+
+function fmt(n) { return '$' + Math.round(n).toLocaleString(); }
+
+function renderFullTable(tbodyId, data) {
+  const mx = Math.max(...data.map(r=>r.avg));
+  const el = document.getElementById(tbodyId);
+  if (!el) return;
+  if (!data.length) { el.innerHTML = '<tr><td colspan="8" class="empty-note">No data for this window</td></tr>'; return; }
+  el.innerHTML = data.map((r,i) => {
+    const pct = Math.round(r.avg/mx*100);
+    const oneSend = r.s===1 ? '<span class="one-send-badge">1 send</span>' : '';
+    const dup = (r.n||'').includes('/') ? '<span class="dup-note">↕ ambiguous</span>' : '';
+    const med = r.med != null ? fmt(r.med) : '—';
+    const max = r.max != null ? fmt(r.max) : '—';
+    return `<tr>
+      <td class="td-rank">${i+1}</td>
+      <td><span class="code-chip">${r.c}</span></td>
+      <td class="td-name">${r.n}${dup}${oneSend}</td>
+      <td class="td-r">${r.s}</td>
+      <td><div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><span class="bar-amt">${fmt(r.avg)}</span></div></td>
+      <td class="td-r">${med}</td>
+      <td class="td-r">${max}</td>
+      <td class="td-r">${fmt(r.tot)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderClients(clients) {
+  const grid = document.getElementById('client-grid');
+  if (!clients || !Object.keys(clients).length) {
+    grid.innerHTML = '<div class="note-card">No client data for this window.</div>';
+    return;
+  }
+  grid.innerHTML = Object.entries(clients).map(([name, rows]) => {
+    const sends = rows.reduce((a,r)=>a+r.s,0);
+    const rowsHtml = rows.map((r,i) => `<tr>
+      <td class="mt-rank">${i+1}</td>
+      <td><span class="code-chip">${r.c}</span></td>
+      <td class="mt-name">${r.n}</td>
+      <td class="mt-sends">${r.s}×</td>
+      <td class="mt-avg">${fmt(r.avg)}</td>
+    </tr>`).join('');
+    return `<div class="client-wrap">
+      <div class="client-head">
+        <span class="client-name">${name}</span>
+        <span class="client-sends">${sends} sends</span>
+      </div>
+      <table class="mini-table">${rowsHtml}</table>
+    </div>`;
+  }).join('');
+}
+
+function updateReport(wKey) {
+  const d = W[wKey];
+  document.getElementById('s-em').textContent = d.em;
+  document.getElementById('s-sms').textContent = d.sms;
+  document.getElementById('s-topics').textContent = d.em_topics.length;
+  document.getElementById('s-clients').textContent = Object.keys(d.clients||{}).length;
+  document.getElementById('datestamp').textContent = `${d.cutoff} – ${d.maxDate} · ${wKey}d window`;
+  renderFullTable('tb-em', d.em_topics);
+  renderFullTable('tb-sms', d.sms_topics);
+  renderClients(d.clients);
+}
+
+function setWindow(days, el) {
+  currentWindow = String(days);
+  document.querySelectorAll('.dtb').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  updateReport(currentWindow);
+}
+
 function showTab(id, el) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   el.classList.add('active');
 }
-function filterEmails(type, el) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('#emailList .email-row').forEach(row => {
-    row.style.display = (type === 'all' || (row.dataset.type||'').includes(type)) ? '' : 'none';
-  });
-}
+
+updateReport("30");
 </script>
 </body>
 </html>
